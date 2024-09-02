@@ -10,6 +10,10 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faPhone, faUser, faFlag } from '@fortawesome/free-solid-svg-icons'
 library.add(faPhone, faUser, faFlag)
 
+import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap"
+import "bootstrap-icons/font/bootstrap-icons.css"
+
 import App from './App.vue'
 import router from './router'
 
