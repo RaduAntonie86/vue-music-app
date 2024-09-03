@@ -19,9 +19,11 @@
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@vueuse/core": "^11.0.3",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "pinia": "^2.1.7",
+    "ts-audio": "^0.7.4",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",
     "vue3-perfect-scrollbar": "^2.0.0"
