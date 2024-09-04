@@ -1,3 +1,7 @@
+#.NET
+bin/
+obj/
+
 # Logs
 logs
 *.log
@@ -28,3 +32,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+docs/_book
+test/
