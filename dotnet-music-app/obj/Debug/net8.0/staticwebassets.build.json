@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "nwviQWBzoKTmKtvv6KZTlzjo2fxSgYIB50bBiYq+XBM=",
+  "Source": "dotnet-music-app",
+  "BasePath": "_content/dotnet-music-app",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

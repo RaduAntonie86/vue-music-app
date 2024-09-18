@@ -1,0 +1,6 @@
+@dotnet_music_app_HostAddress = http://localhost:5091
+
+GET {{dotnet_music_app_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
