@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
+    "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
+    "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectUniqueName": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "projectName": "dotnet-music-app",
-        "projectPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectPath": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "packagesPath": "C:\\Users\\Radu\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\obj\\",
+        "outputPath": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Radu\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -46,9 +46,29 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
             "Microsoft.EntityFrameworkCore.InMemory": {
               "target": "Package",
               "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.5, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
