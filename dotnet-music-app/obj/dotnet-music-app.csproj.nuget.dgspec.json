@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
+    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
+    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectUniqueName": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "projectName": "dotnet-music-app",
-        "projectPath": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "packagesPath": "C:\\Users\\Radu\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\obj\\",
+        "outputPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Radu\\AppData\\Roaming\\NuGet\\NuGet.Config",
