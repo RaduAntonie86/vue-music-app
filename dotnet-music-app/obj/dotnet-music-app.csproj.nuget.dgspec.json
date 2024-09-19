@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
+    "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
+    "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectUniqueName": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "projectName": "dotnet-music-app",
-        "projectPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectPath": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "packagesPath": "C:\\Users\\Radu\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\obj\\",
+        "outputPath": "c:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Radu\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -46,9 +46,25 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.35, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
             "Microsoft.EntityFrameworkCore.InMemory": {
               "target": "Package",
               "version": "[8.0.8, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL.Design": {
+              "target": "Package",
+              "version": "[1.1.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
