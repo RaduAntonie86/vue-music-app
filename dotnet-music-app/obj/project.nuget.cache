@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "82+kVDIcT04=",
+  "dgSpecHash": "xxf8i0vFSx4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+  "projectFilePath": "C:\\Users\\Radu\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Radu\\.nuget\\packages\\dapper\\2.1.35\\dapper.2.1.35.nupkg.sha512",
     "C:\\Users\\Radu\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.8\\microsoft.entityframeworkcore.8.0.8.nupkg.sha512",

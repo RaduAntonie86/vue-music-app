@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
+    "C:\\Users\\Radu\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
+    "C:\\Users\\Radu\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectUniqueName": "C:\\Users\\Radu\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "projectName": "dotnet-music-app",
-        "projectPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
+        "projectPath": "C:\\Users\\Radu\\vue-music-app\\dotnet-music-app\\dotnet-music-app.csproj",
         "packagesPath": "C:\\Users\\Radu\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Radu\\Projects\\vue-music-app\\dotnet-music-app\\obj\\",
+        "outputPath": "C:\\Users\\Radu\\vue-music-app\\dotnet-music-app\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\Radu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

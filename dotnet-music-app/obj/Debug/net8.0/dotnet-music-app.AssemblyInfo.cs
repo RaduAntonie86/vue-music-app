@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("dotnet-music-app")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c570f6b38d89b1a2bff85e0a447938ec67ebff3e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3b2bb2039952bfef3251f6a0543321ab8453d398")]
 [assembly: System.Reflection.AssemblyProductAttribute("dotnet-music-app")]
 [assembly: System.Reflection.AssemblyTitleAttribute("dotnet-music-app")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
