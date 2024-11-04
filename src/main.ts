@@ -11,6 +11,9 @@ import LeftSideButtons from './components/LeftSideButtons.vue'
 import MainPage from './components/MainPage.vue'
 import SearchPage from './components/SearchPage.vue'
 import AlbumPage from './components/AlbumPage.vue'
+import AlbumPreview from './components/AlbumPreview.vue'
+import TrackBar from './components/TrackBar.vue'
+import PlaylistPreview from './components/PlaylistPreview.vue'
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
@@ -32,8 +35,12 @@ app.component('left-side-buttons', LeftSideButtons)
 app.component('main-page', MainPage)
 app.component('search-page', SearchPage)
 app.component('album-page', AlbumPage)
+app.component('album-preview', AlbumPreview)
+app.component('track-bar', TrackBar)
+app.component('playlist-preview', PlaylistPreview)
 
 createApp(App).use(PerfectScrollbarPlugin).mount('#app')
+createApp(App).use(router).mount('#app')
 
 app.use(createPinia())
 app.use(router)

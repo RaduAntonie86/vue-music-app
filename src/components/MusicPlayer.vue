@@ -55,10 +55,7 @@ function previousSong(){
         <i class="bi bi-repeat ml-16 text-xl text-white"></i>
     </div>
     <div class="grid justify-items-end place-items-center p-2">
-        <svg width="225" height="11">
-            <rect width="225" height="11" rx="7" ry="7" fill="gray"/>
-            <rect width="150" height="11" rx="7" ry="7" fill="white"/>
-        </svg>
+      <track-bar width="220" height="11" percent="55"></track-bar>
     </div>
 </div>
 </template>
