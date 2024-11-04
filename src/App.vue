@@ -6,6 +6,6 @@
     <div class="overflow-hidden mb-2 px-2 flex-grow">
       <main-menu></main-menu>
     </div>
-    <music-player class="p-4"></music-player>
+    <music-player class="p-2"></music-player>
   </div>
 </template>

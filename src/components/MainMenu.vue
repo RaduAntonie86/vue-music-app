@@ -8,7 +8,6 @@
             <left-side-buttons></left-side-buttons>
             <left-sidebar class="row-span-7"></left-sidebar>
         </div>   
-        
         <RouterView class="sm:col-span-2 md:col-span-3 lg:col-span-5 xl:col-span-6"/>
     </div>
 </template>
