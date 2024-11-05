@@ -45,23 +45,20 @@ function previousSong(){
       </div>
 
       <!-- Shuffle button, visible on medium screens and centered vertically -->
-      <div class="hidden md:flex justify-center items-center h-full">
+      <button class="hidden md:flex justify-center items-center h-full">
         <i class="bi bi-shuffle text-xl text-white"></i>
-      </div>
+      </button>
 
       <!-- Media controls section with centered track bar -->
       <div class="flex flex-col items-center justify-center h-full">
         <div class="flex items-center">
-          <button @click="previousSong">
-            <i class="bi bi-skip-backward-fill mr-5 text-[22px] text-white"></i>
-          </button>
-          <button v-if="!playing" @click="playing = !playing">
-              <i class="bi bi-play-fill text-[25px]" style="color: white;"></i>
-          </button>
-          <button v-if="playing" @click="playing = !playing">
-              <i class="bi bi-pause-fill text-[25px]" style="color: white;"></i>
-          </button>
-          <i class="bi bi-skip-forward-fill ml-5 text-[22px] text-white"></i>
+          <icon-button @click="previousSong"
+          iconName="bi-skip-backward-fill" class="mr-5 text-[22px]"></icon-button>
+          <icon-button v-if="!playing" @click="playing = !playing"
+          iconName="bi-play-fill" class="text-[25px]"></icon-button>
+          <icon-button v-if="playing" @click="playing = !playing"
+          iconName="bi-pause-fill" class="text-[25px]"></icon-button>
+          <icon-button iconName="bi-skip-forward-fill" class="ml-5 text-[22px]"></icon-button>
         </div>
 
         <div class="flex justify-center w-full mt-2">
@@ -70,13 +67,11 @@ function previousSong(){
       </div>
 
       <!-- Repeat button, visible on medium screens and centered vertically -->
-      <div class="hidden md:flex justify-center items-center h-full">
-        <i class="bi bi-repeat text-xl text-white"></i>
-      </div>
+      <icon-button iconName="bi-repeat" class="hidden md:flex justify-center items-center h-full text-xl"></icon-button>
 
       <!-- Volume control section -->
       <div class="flex items-center">
-        <i class="bi bi-volume-up-fill text-xl text-white"></i>
+        <icon-button iconName="bi-volume-up-fill mr-2 text-2xl"></icon-button>
         <track-bar width="220" height="11" percent="55"></track-bar>
       </div>
       

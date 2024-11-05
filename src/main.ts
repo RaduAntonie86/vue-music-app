@@ -14,6 +14,7 @@ import AlbumPage from './components/AlbumPage.vue'
 import AlbumPreview from './components/AlbumPreview.vue'
 import TrackBar from './components/TrackBar.vue'
 import PlaylistPreview from './components/PlaylistPreview.vue'
+import IconButton from './components/IconButton.vue'
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
@@ -38,6 +39,7 @@ app.component('album-page', AlbumPage)
 app.component('album-preview', AlbumPreview)
 app.component('track-bar', TrackBar)
 app.component('playlist-preview', PlaylistPreview)
+app.component('icon-button', IconButton)
 
 createApp(App).use(PerfectScrollbarPlugin).mount('#app')
 createApp(App).use(router).mount('#app')
