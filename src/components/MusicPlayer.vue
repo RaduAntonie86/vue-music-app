@@ -35,21 +35,18 @@ function previousSong(){
   <div class="bg-[#362323]">
     <div class="grid grid-cols-3 md:grid-cols-5 gap-2 text-white items-center"> <!-- Centers items vertically -->
 
-      <!-- Song info and image -->
       <div class="flex align-middle items-center">
         <img class="rounded-3xl mr-[10px]" src="../assets/images/album.jpeg" width="70" height="70">
         <div> 
-          <div class="text-white text-lg font-arial">{{ currentSong.title }}</div> <!-- Dynamic song title -->
-          <div class="text-white text-xs font-arial">{{ currentSong.artist }}</div> <!-- Dynamic artist name -->
+          <div class="text-white text-lg font-arial">{{ currentSong.title }}</div>
+          <div class="text-white text-xs font-arial">{{ currentSong.artist }}</div>
         </div> 
       </div>
 
-      <!-- Shuffle button, visible on medium screens and centered vertically -->
       <button class="hidden md:flex justify-center items-center h-full">
         <i class="bi bi-shuffle text-xl text-white"></i>
       </button>
 
-      <!-- Media controls section with centered track bar -->
       <div class="flex flex-col items-center justify-center h-full">
         <div class="flex items-center">
           <icon-button @click="previousSong"
@@ -66,10 +63,8 @@ function previousSong(){
         </div>
       </div>
 
-      <!-- Repeat button, visible on medium screens and centered vertically -->
       <icon-button iconName="bi-repeat" class="hidden md:flex justify-center items-center h-full text-xl"></icon-button>
 
-      <!-- Volume control section -->
       <div class="flex items-center">
         <icon-button iconName="bi-volume-up-fill mr-2 text-2xl"></icon-button>
         <track-bar width="220" height="11" percent="55"></track-bar>
