@@ -25,8 +25,8 @@ public class SongService : ISongService
 
     public async Task<Song> GetSong(int id)
     {
-        var songList = await _dbService.GetAsync<Song>("SELECT * FROM public.song where id=@Id", new {id});
-        return songList;
+        var song = await _dbService.GetAsync<Song>("SELECT * FROM public.song where id=@Id", new {id});
+        return song;
     }
 
     public async Task<Song> UpdateSong(Song song)
