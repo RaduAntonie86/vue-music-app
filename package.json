@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": "main.js",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -14,7 +15,9 @@
     "format": "prettier --write src/",
     "serve": "concurrently \"npm run dev\" \"npm run dotnet\"",
     "vue": "npm run serve",
-    "dotnet": "cd ./dotnet-music-app && dotnet watch run"
+    "dotnet": "cd ./dotnet-music-app && dotnet watch run",
+    "start": "react-scripts start",
+    "electron": "electron ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -45,6 +48,7 @@
     "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.0.1",
+    "electron": "^33.1.0",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.23.0",
     "jsdom": "^24.1.0",
