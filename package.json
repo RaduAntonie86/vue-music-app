@@ -13,7 +13,7 @@
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
-    "serve": "concurrently \"npm run dev\" \"npm run dotnet\"",
+    "serve": "concurrently \"npm run dev\" \"npm run dotnet\" \"npm run electron\"",
     "vue": "npm run serve",
     "dotnet": "cd ./dotnet-music-app && dotnet watch run",
     "start": "react-scripts start",

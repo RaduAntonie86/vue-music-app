@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useMediaControls } from '@vueuse/core'
 
 // Define the song object with properties that can be dynamic (e.g., title, artist, and id)
-const currentSong = reactive({
-  id: 1, // Example song ID; this could be dynamic
-  title: 'Song Name',
-  artist: 'Artist Name',
-  src: '', // Initially empty; will be set when mounted
-})
+interface Props{
+  songId: number;
+  songName: string;
+  artistName: string;
+  imagePath: string;
+}
+
+const props = defineProps<Props>();
 
 // Create a ref for the audio element
 const audio = ref<HTMLAudioElement | null>(null)
 
+let songPath = '';
+
 // Use media controls with the song's src property
 const { playing, currentTime, duration, volume } = useMediaControls(audio, {
-  src: currentSong.src,  // Set the source dynamically
+  src: songPath,  // Set the source dynamically
 })
 
 // Change initial media properties when the component is mounted
 onMounted(() => {
-  currentSong.src = `http://localhost:5091/Songs/stream/${currentSong.id}`; // Set the song source dynamically based on song ID
+  songPath = computed(() => `http://localhost:5091/Songs/stream/${props.songId}`).value;
 })
 
 // Function to play the song
@@ -73,8 +77,8 @@ function handleAudioError() {
       <div class="flex align-middle items-center">
         <img class="rounded-3xl mr-[10px]" src="../assets/images/album.jpeg" width="70" height="70">
         <div> 
-          <div class="text-white text-lg font-arial">{{ currentSong.title }}</div>
-          <div class="text-white text-xs font-arial">{{ currentSong.artist }}</div>
+          <div class="text-white text-lg font-arial">{{ props.songName }}</div>
+          <div class="text-white text-xs font-arial">{{ props.artistName }}</div>
         </div> 
       </div>
 
@@ -111,5 +115,5 @@ function handleAudioError() {
     </div>
   </div>
 
-  <audio ref="audio" :src="currentSong.src" @error="handleAudioError"></audio>
+  <audio ref="audio" :src="songPath" @error="handleAudioError"></audio>
 </template>
