@@ -198,6 +198,7 @@ dlldata.c
 # DNX
 project.lock.json
 project.fragment.lock.json
+appsettings.json
 artifacts/
 
 *_i.c
@@ -224,7 +225,6 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
-appsettings.json
 
 # Chutzpah Test files
 _Chutzpah*
