@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]")]
-public class SongController : Controller
+public class UserController : Controller
 {
     private string basePath = "C:\\Users\\Radu\\vue-music-app\\src\\assets\\songs\\";
     private readonly ISongService _songService;
     
-    public SongController(ISongService songService)
+    public UserController(ISongService songService)
     {
         _songService = songService;
     }

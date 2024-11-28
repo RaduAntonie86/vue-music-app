@@ -15,13 +15,14 @@ public class MusicAppDbService : IDbService
     {
         T result;
 
-        result = (await _db.QueryAsync<T>(command, parms).ConfigureAwait(false)).FirstOrDefault();
+        result = (await _db.QueryAsync<T>(command,
+                                          parms).ConfigureAwait(false)).FirstOrDefault();
 
         return result;
 
     }
 
-    public async Task<List<T>> GetAll<T>(string command, object parms)
+    public async Task<List<T>> GetAll<T>(string command, object parms = default!)
     {
 
         List<T> result = new List<T>();

@@ -18,7 +18,7 @@ public class SongService : ISongService
 
     public async Task<List<Song>> GetSongList()
     {
-        var songList = await _dbService.GetAll<Song>("SELECT * FROM public.song", new { });
+        var songList = await _dbService.GetAll<Song>("SELECT * FROM public.song");
         return songList;
     }
 
