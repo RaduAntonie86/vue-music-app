@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 public class SongController : Controller
 {
-    private string basePath = "C:\\Users\\Radu\\vue-music-app\\src\\assets\\songs\\";
     private readonly ISongService _songService;
     
     public SongController(ISongService songService)
@@ -65,7 +64,7 @@ public class SongController : Controller
         }
 
         // Assuming song.FilePath holds the path to the audio file
-        var filePath = basePath + song.Path;
+        var filePath = song.Path;
 
         if (!System.IO.File.Exists(filePath))
         {
