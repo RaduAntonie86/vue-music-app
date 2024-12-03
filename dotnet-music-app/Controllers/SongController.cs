@@ -51,11 +51,9 @@ public class SongController : Controller
         return Ok(result);
     }
 
-    // New method to stream song audio
     [HttpGet("stream/{id:int}")]
     public async Task<IActionResult> StreamSong(int id)
     {
-        // Fetch the song details (including file path) from the database
         var song = await _songService.GetSong(id);
 
         if (song == null)
@@ -63,7 +61,6 @@ public class SongController : Controller
             return NotFound();
         }
 
-        // Assuming song.FilePath holds the path to the audio file
         var filePath = song.Path;
 
         if (!System.IO.File.Exists(filePath))

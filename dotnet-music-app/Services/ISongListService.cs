@@ -1,7 +1,9 @@
 public interface ISongListService
 {
     Task<bool> CreateSongList(SongList songList);
-    Task<SongList> GetSongList(int id);
+    Task<Album> GetAlbum(int id);
+    Task<Playlist> GetPlaylist(int id);
     Task<SongList> UpdateSongList(SongList songList);
-    Task<bool> DeleteSongList(int key);
+    Task<bool> DeleteAlbum(int key);
+    Task<bool> DeletePlaylist(int key);
 }

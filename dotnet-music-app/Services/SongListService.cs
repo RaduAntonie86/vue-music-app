@@ -11,53 +11,79 @@ public class SongListService : ISongListService
     {
         if(songList is Album)
         {
-            await AddToSongList(songList, "album_songs");
-            var result =
-                await _dbService.EditData(
-                    @"INSERT INTO public.album (id, release_date, name, image_path) 
-                    VALUES (@Id, @ReleaseDate, @Name, @ImagePath)",
-                    songList);
-            await AddToGenreList((Album) songList);
+            var query = @"INSERT INTO public.album (id, release_date, name, image_path) 
+                    VALUES (@Id, @ReleaseDate, @Name, @ImagePath)";
+            var parameters = songList;
+            await _dbService.EditData(query, parameters);
+
+            await AddSongsToAlbum(songList.SongIds, songList.Id);
+            await AddToGenreList(songList.SongIds, songList.Id);
         }
         else if(songList is Playlist)
         {
-            await AddToSongList(songList, "playlist_songs");
-            var result =
-                await _dbService.EditData(
-                    @"INSERT INTO public.album (id, description, name, image_path) 
-                    VALUES (@Id, @Description, @Name, @ImagePath)",
-                    songList);
+            var query = @"INSERT INTO public.playlist (id, description, name, image_path) 
+                    VALUES (@Id, @Description, @Name, @ImagePath)";
+            var parameters = songList;
+            await _dbService.EditData(query, parameters);
+            await AddSongsToPlaylist(songList.SongIds, songList.Id);
         }
         return true;
     }
 
-
-    public async Task<SongList> GetSongList(int id)
+    public async Task<Album> GetAlbum(int id)
     {
-        var songList = await _dbService.GetAsync<SongList>(
-        "SELECT * FROM public.user where id=@Id", new {id});
-        return songList;
+        var query = @"SELECT * FROM public.album where id=@Id";
+        var parameters = new {id};
+        var album = await _dbService.GetAsync<Album>(query, parameters);
+        return album;
+    }
+
+    public async Task<Playlist> GetPlaylist(int id)
+    {
+        var query = @"SELECT * FROM public.playlist where id=@Id";
+        var parameters = new {id};
+        var playlist = await _dbService.GetAsync<Playlist>(query, parameters);
+        return playlist;
     }
 
     public async Task<SongList> UpdateSongList(SongList songList)
     {
-        var updateSongList =
-            await _dbService.EditData(
-                @"UPDATE public.user 
-                SET display_name=@DisplayName, 
-                    username=@SongListname, 
-                    password=@Password, 
-                    description=@Description, 
-                    image_path=@Image_Path 
-                WHERE id=@Id",
-                songList);
+        if(songList is Album)
+        {
+            var query = @"UPDATE public.album (id, release_date, name, image_path) 
+                    SET id=@Id, 
+                        release_date=@ReleaseDate, 
+                        name=@Name, 
+                        image_path=@ImagePath";
+            var parameters = songList;
+            await _dbService.EditData(query, parameters);
+        }
+        else if(songList is Playlist)
+        {
+            var query = @"INSERT INTO public.playlist (id, description, name, image_path) 
+                    SET id=@Id, 
+                        description=@Description, 
+                        name=@Name, 
+                        image_path=@ImagePath)";
+            var parameters = songList;
+            await _dbService.EditData(query, parameters);
+        }
         return songList;
     }
 
-    public async Task<bool> DeleteSongList(int id)
+    public async Task<bool> DeleteAlbum(int id)
     {
-        var deleteSongList = await _dbService.EditData(
-            "DELETE FROM public.user WHERE id=@Id", new {id});
+        var query = @"DELETE FROM public.album where id=@Id";
+        var parameters = new {id};
+        await _dbService.EditData(query, parameters);
+        return true;
+    }
+
+    public async Task<bool> DeletePlaylist(int id)
+    {
+        var query = @"DELETE FROM public.playlist where id=@Id";
+        var parameters = new {id};
+        await _dbService.EditData(query, parameters);
         return true;
     }
     private async Task AddSongsToAlbum(List<int> songIds, int albumId)
@@ -96,18 +122,18 @@ public class SongListService : ISongListService
         }
     }
     
-    private async Task AddSongsToPlaylist(List<int> songIds, int playlistId)
+    private async Task AddToGenreList(List<int> genreIds, int albumId)
     {
-        foreach (var songId in songIds)
+        foreach (var genreId in genreIds)
         {
             var query = @"
-                INSERT INTO public.playlist_songs (playlist_id, song_id) 
-                VALUES (@PlaylistId, @SongId)";
+                INSERT INTO public.album_genres (album_id, genre_id) 
+                VALUES (@AlbumId, @GenreId)";
 
             var parameters = new 
             {
-                PlaylistId = playlistId,
-                SongId = songId
+                GenreId = genreId,
+                AlbumId = albumId
             };
 
             await _dbService.EditData(query, parameters);
