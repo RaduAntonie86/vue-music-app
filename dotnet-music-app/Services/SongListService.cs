@@ -38,6 +38,20 @@ public class SongListService : ISongListService
         return album;
     }
 
+    public async Task<List<Album>> GetAlbumList()
+    {
+        var query = @"SELECT * FROM public.album";
+        var albumList = await _dbService.GetAsync<List<Album>>(query, new{});
+        return albumList;
+    }
+
+    public async Task<List<Playlist>> GetPlaylistList()
+    {
+        var query = @"SELECT * FROM public.playlist";
+        var playlistList = await _dbService.GetAsync<List<Playlist>>(query, new{});
+        return playlistList;
+    }
+
     public async Task<Playlist> GetPlaylist(int id)
     {
         var query = @"SELECT * FROM public.playlist where id=@Id";

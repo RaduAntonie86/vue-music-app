@@ -5,6 +5,7 @@ public class SongList
     public required string ImagePath { get; set; }
     public required List<int> SongIds { get; set; }
     public required int UserId { get; set; }
+    public SongList() { }
     public SongList(int id, string name, string imagePath, List<int> songIds, int userId)
     {
         Id = id;

@@ -2,6 +2,7 @@ public class Album : SongList
 {
     public required DateOnly ReleaseDate { get; set; }
     public required List<int> GenreIds { get; set; }
+    public Album(): base() { }
     public Album(
         int id,
         string name,

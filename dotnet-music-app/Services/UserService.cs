@@ -7,12 +7,12 @@ public class UserService : IUserService
         _dbService = dbService;
     }
 
-    public async Task<bool> CreateUser(User User)
+    public async Task<bool> CreateUser(User user)
     {
         var result =
             await _dbService.EditData(
                 "INSERT INTO public.user (id, display_name, username, password, description, image_path) VALUES (@Id, @DisplayName, @Username, @Password, @Description, @ImagePath)",
-                User);
+                user);
         return true;
     }
 
@@ -29,13 +29,13 @@ public class UserService : IUserService
         return User;
     }
 
-    public async Task<User> UpdateUser(User User)
+    public async Task<User> UpdateUser(User user)
     {
         var updateUser =
             await _dbService.EditData(
                 "Update public.user SET display_name=@DisplayName, username=@Username, password=@Password, description=@Description, image_path=@Image_Path WHERE id=@Id",
-                User);
-        return User;
+                user);
+        return user;
     }
 
     public async Task<bool> DeleteUser(int id)

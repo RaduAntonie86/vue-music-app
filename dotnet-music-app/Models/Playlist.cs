@@ -1,7 +1,7 @@
 public class Playlist : SongList
 {
     public required string Description { get; set; }
-
+    public Playlist(): base() { }
     public Playlist(
         int id,
         string name,

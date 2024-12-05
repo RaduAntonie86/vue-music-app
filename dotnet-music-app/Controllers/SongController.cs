@@ -12,7 +12,7 @@ public class SongController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> GetSongList()
     {
         var result =  await _songService.GetSongList();
 

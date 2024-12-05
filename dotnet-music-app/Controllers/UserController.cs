@@ -4,75 +4,50 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 public class UserController : Controller
 {
-    private string basePath = "C:\\Users\\Radu\\vue-music-app\\src\\assets\\songs\\";
-    private readonly ISongService _songService;
-    
-    public UserController(ISongService songService)
+    private readonly IUserService _userService;  // Change from _songService to _userService
+
+    public UserController(IUserService userService)  // Change parameter name to userService
     {
-        _songService = songService;
+        _userService = userService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> GetUserList()
     {
-        var result =  await _songService.GetSongList();
+        var result = await _userService.GetUserList(); // Change _songService to _userService
 
         return Ok(result);
     }
-    
+
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetSong(int id)
+    public async Task<IActionResult> GetUser(int id)
     {
-        var result =  await _songService.GetSong(id);
+        var result = await _userService.GetUser(id); // Change _songService to _userService
 
         return Ok(result);
     }
-    
+
     [HttpPost]
-    public async Task<IActionResult> AddSong([FromBody]Song song)
+    public async Task<IActionResult> AddUser([FromBody] User user)  // Change parameter name to user
     {
-        var result =  await _songService.CreateSong(song);
+        var result = await _userService.CreateUser(user);  // Change _songService to _userService
 
         return Ok(result);
     }
-    
+
     [HttpPut]
-    public async Task<IActionResult> UpdateSong([FromBody]Song song)
+    public async Task<IActionResult> UpdateUser([FromBody] User user)  // Change parameter name to user
     {
-        var result =  await _songService.UpdateSong(song);
+        var result = await _userService.UpdateUser(user);  // Change _songService to _userService
 
         return Ok(result);
     }
-    
+
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteSong(int id)
+    public async Task<IActionResult> DeleteUser(int id)
     {
-        var result =  await _songService.DeleteSong(id);
+        var result = await _userService.DeleteUser(id);  // Change _songService to _userService
 
         return Ok(result);
-    }
-
-    // New method to stream song audio
-    [HttpGet("stream/{id:int}")]
-    public async Task<IActionResult> StreamSong(int id)
-    {
-        // Fetch the song details (including file path) from the database
-        var song = await _songService.GetSong(id);
-
-        if (song == null)
-        {
-            return NotFound();
-        }
-
-        // Assuming song.FilePath holds the path to the audio file
-        var filePath = basePath + song.Path;
-
-        if (!System.IO.File.Exists(filePath))
-        {
-            return NotFound();
-        }
-
-        var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        return File(fileStream, "audio/mpeg", enableRangeProcessing: true);
     }
 }

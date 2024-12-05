@@ -7,6 +7,7 @@ public class User
     public required string ImagePath { get; set; }
     public required string Description { get; set; }
     public required List<int> ListeningHistory { get; set; }
+    public User() { }
     public User(string id, string displayName, string username, string password, string imagePath = "", string description = "")
     {
         Id = id;
