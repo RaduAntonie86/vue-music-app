@@ -9,6 +9,7 @@ public class SongListService : ISongListService
 
     public async Task<bool> CreateSongList(SongList songList)
     {
+        // start transaction
         if(songList is Album)
         {
             var query = @"INSERT INTO public.album (id, release_date, name, image_path) 
@@ -27,6 +28,7 @@ public class SongListService : ISongListService
             await _dbService.EditData(query, parameters);
             await AddSongsToPlaylist(songList.SongIds, songList.Id);
         }
+        // end transaction
         return true;
     }
 

@@ -25,15 +25,15 @@ public class UserService : IUserService
 
     public async Task<User> GetUser(int id)
     {
-        var User = await _dbService.GetAsync<User>("SELECT * FROM public.user where id=@Id", new {id});
-        return User;
+        var user = await _dbService.GetAsync<User>("SELECT * FROM public.user where id=@Id", new {id});
+        return user;
     }
 
     public async Task<User> UpdateUser(User user)
     {
         var updateUser =
             await _dbService.EditData(
-                "Update public.user SET display_name=@DisplayName, username=@Username, password=@Password, description=@Description, image_path=@Image_Path WHERE id=@Id",
+                "UPDATE public.user SET display_name=@DisplayName, username=@Username, password=@Password, description=@Description, image_path=@Image_Path WHERE id=@Id",
                 user);
         return user;
     }
