@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PlaylistPage from '@/components/PlaylistPage.vue'
-import MainPage from '@/components/MainPage.vue'
+import AppPage from '@/components/AppPage.vue'
 import SearchPage from '@/components/SearchPage.vue'
 import AlbumPage from '@/components/AlbumPage.vue'
+import LoginPage from '@/components/LoginPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: MainPage
+      component: AppPage 
     },
     {
       path: '/playlist',
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/search',
       name: 'search',
       component: SearchPage
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginPage
     },
     {
       path: '/album',
