@@ -7,6 +7,7 @@ builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISongListService, SongListService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Register controllers
 builder.Services.AddControllers();
