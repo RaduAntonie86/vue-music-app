@@ -11,7 +11,7 @@ public class UserService : IUserService
     {
         var result =
             await _dbService.EditData(
-                "INSERT INTO public.user (id, display_name, username, password, description, image_path) VALUES (@Id, @DisplayName, @Username, @Password, @Description, @ImagePath)",
+                "INSERT INTO public.user (display_name, username, password, description, image_path) VALUES (@DisplayName, @Username, @Password, @Description, @ImagePath)",
                 user);
         return true;
     }

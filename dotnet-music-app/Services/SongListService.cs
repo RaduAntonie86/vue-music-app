@@ -50,14 +50,14 @@ public class SongListService : ISongListService
     public async Task<List<Playlist>> GetPlaylistList()
     {
         var query = @"SELECT * FROM public.playlist";
-        var playlistList = await _dbService.GetAsync<List<Playlist>>(query, new{});
+        var playlistList = await _dbService.GetAll<Playlist>(query, new {});
         return playlistList;
     }
-
+    
     public async Task<Playlist> GetPlaylist(int id)
     {
         var query = @"SELECT * FROM public.playlist where id=@Id";
-        var parameters = new {id};
+        var parameters = new { id };
         var playlist = await _dbService.GetAsync<Playlist>(query, parameters);
         return playlist;
     }

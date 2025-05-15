@@ -3,31 +3,33 @@ import router from '@/router'
 import { ref } from 'vue'
 
 // Reactive variables
+const display_name = ref('')
 const username = ref('')
 const password = ref('')
 
 // Submit handler
-const handleLogin = async () => {
+const handleSignup = async () => {
   if (!username.value || !password.value) {
     alert('Please fill in both username and password.')
     return
   }
   try {
-    const response = await fetch('http://localhost:5091/Auth/login', {
+    const response = await fetch('http://localhost:5091/User', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        displayName: display_name.value,
         username: username.value,
-        password: password.value
+        password: password.value,
       })
     })
 
-    if (!response.ok) throw new Error('Login failed')
+    if (!response.ok) throw new Error('Sign up failed')
 
     const data = await response.json()
-    console.log('Login success:', data)
+    console.log('Sign up success:', data)
     router.push("/");
   } catch (error) {
     console.error('', error)
@@ -46,6 +48,18 @@ async function toSHA256(message: string): Promise<string> {
 </script>
 
 <template>
+  <div class="flex justify-center">
+    <p class="text-white font-arial mt-5 text-2xl">Display Name:</p>
+  </div>
+  <div class="flex justify-center">
+    <input
+      v-model="display_name"
+      class="form-control me-2 input-rounded text-[#efd0d0] bg-custom max-w-[30vh]"
+      type="text"
+      placeholder="Display Name"
+    />
+  </div>
+
   <div class="flex justify-center">
     <p class="text-white font-arial mt-5 text-2xl">Username:</p>
   </div>
@@ -78,19 +92,19 @@ async function toSHA256(message: string): Promise<string> {
 
   <div class="flex justify-center mt-5">
     <button
-      @click="handleLogin"
+      @click="handleSignup"
       class="text-white font-arial text-2xl font-semibold bg-[#362323] rounded-xl px-4 py-2"
     >
-      Login
+      Sign up
     </button>
   </div>
   
   <div class="flex justify-center mt-5">
     <RouterLink 
-      to="/signup"
+      to="/login"
       class="text-white font-arial text-xl font-semibold bg-[#362323] rounded-xl px-2 py-1 no-underline"
     >
-      Sign up instead
+      Log in instead
     </RouterLink>
   </div>
 </template>

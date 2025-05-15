@@ -1,6 +1,36 @@
 <script setup lang="ts">
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import playlistImage from '../assets/images/album.jpeg'
+import axios from 'axios';
+import { onMounted, ref } from 'vue';
+import router from '@/router';
+
+  interface Playlist {
+    id: number;
+    name: string;
+    image_path: string;
+    description: string;
+  }
+
+  const playlists = ref<Playlist[]>([]);
+
+  const fetchPlaylists = async () => {
+    try {
+      const response = await axios.get<Playlist[]>('http://localhost:5091/Songlist/playlists');
+      playlists.value = response.data; // Update the reactive variable with fetched data
+    } catch (error) {
+      console.error('Error fetching playlists:', error);
+    }
+  };
+
+  const handlePlaylistClick = (id: number) => {
+    console.log('Clicked playlist ID:', id);
+    router.push({ name: 'playlist', params: { id: id.toString() } });
+  };
+
+  onMounted(() => {
+    fetchPlaylists();
+  });
 </script>
 
 <style>
@@ -10,10 +40,12 @@ import playlistImage from '../assets/images/album.jpeg'
 
 <template>
 <PerfectScrollbar class="bg-[#362323] rounded-md p-1">
-    <playlist-preview 
-      playlistName="Playlist Name" 
-      description="Description" 
-      :imagePath=playlistImage>
-    </playlist-preview>
+    <div v-for="(playlist) in playlists" :key="playlist.id" @click="handlePlaylistClick(playlist.id)">
+      <playlist-preview 
+        :playlistName="playlist.name"
+        :description="playlist.description" 
+        :imagePath="playlist.image_path ? playlist.image_path : playlistImage">
+      </playlist-preview>
+    </div>
 </PerfectScrollbar>
 </template>

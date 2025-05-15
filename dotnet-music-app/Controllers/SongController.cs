@@ -26,6 +26,14 @@ public class SongController : Controller
 
         return Ok(result);
     }
+
+    [HttpGet("playlist_id/{playlist_id:int}")]
+    public async Task<IActionResult> GetSongsFromPlaylist(int playlist_id)
+    {
+        var result =  await _songService.GetSongsFromPlaylist(playlist_id);
+
+        return Ok(result);
+    }
     
     [HttpPost]
     public async Task<IActionResult> AddSong([FromBody]Song song)

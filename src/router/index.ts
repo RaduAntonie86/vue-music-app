@@ -4,6 +4,7 @@ import AppPage from '@/components/AppPage.vue'
 import SearchPage from '@/components/SearchPage.vue'
 import AlbumPage from '@/components/AlbumPage.vue'
 import LoginPage from '@/components/LoginPage.vue'
+import SignupPage from '@/components/SignupPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,9 +15,10 @@ const router = createRouter({
       component: AppPage 
     },
     {
-      path: '/playlist',
+      path: '/playlist/:id',
       name: 'playlist',
-      component: PlaylistPage
+      component: PlaylistPage,
+      props: true
     },
     {
       path: '/search',
@@ -27,6 +29,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginPage
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupPage
     },
     {
       path: '/album',
