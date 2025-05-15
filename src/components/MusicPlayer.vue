@@ -1,85 +1,123 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useMediaControls } from '@vueuse/core'
+import { usePlayerStore } from '@/usePlayerStore'
 
-// Define the song object with properties that can be dynamic (e.g., title, artist, and id)
-interface Props{
-  songId: number;
-  songName: string;
-  artistName: string;
-  imagePath: string;
-}
-
-const props = defineProps<Props>();
+const store = usePlayerStore()
 
 // Create a ref for the audio element
 const audio = ref<HTMLAudioElement | null>(null)
 
-let songPath = '';
+const songPath = computed(() =>
+  store.currentSong ? `http://localhost:5091/Song/stream/${store.currentSong.id}` : ''
+)
 
 // Use media controls with the song's src property
-const { playing, currentTime, duration, volume } = useMediaControls(audio, {
-  src: songPath,  // Set the source dynamically
+const { playing, volume } = useMediaControls(audio)
+
+const currentSong = computed(() => store.currentSong)
+
+watch(currentSong, (newSong) => {
+  if (newSong && audio.value) {
+    // Wait until the audio is ready before trying to play
+    const tryPlay = () => {
+      audio.value?.play()
+        .then(() => {
+          playing.value = true
+        })
+        .catch(err => {
+          console.error('Autoplay failed:', err)
+        })
+
+      // Remove listener after firing
+      audio.value?.removeEventListener('canplay', tryPlay)
+    }
+
+    // Attach listener once, then try to play
+    audio.value.addEventListener('canplay', tryPlay, { once: true })
+    
+    // Force reload the audio when the src changes
+    audio.value.load()
+  }
 })
 
-// Change initial media properties when the component is mounted
-onMounted(() => {
-  songPath = computed(() => `http://localhost:5091/Songs/stream/${props.songId}`).value;
-})
 
-// Function to play the song
 function playSong() {
   if (audio.value) {
-    audio.value.play().then(() => {
-      playing.value = true;
-      //console.log("Audio is playing");
-    }).catch((err) => {
-      console.error("Error playing audio", err);
-    });
+    audio.value
+      .play()
+      .then(() => {
+        playing.value = true
+      })
+      .catch((err) => {
+        console.error('Autoplay failed:', err)
+      })
   }
 }
 
 // Function to pause the song
 function pauseSong() {
   if (audio.value) {
-    playing.value = false;
-    audio.value.pause();
+    playing.value = false
+    audio.value.pause()
     //console.log("Audio is paused");
   }
 }
 
-// Function to handle previous song action
-function previousSong() {
-  if (audio.value) {
-    audio.value.currentTime = 0; // Reset to the beginning
-  }
-  // You can set currentSong.id to a previous song ID if you have a list of songs
-}
-
 function togglePlayPause() {
   if (playing.value) {
-    pauseSong();
+    pauseSong()
   } else {
-    playSong();
+    playSong()
   }
 }
 
 // Function to handle audio errors
 function handleAudioError() {
-  console.error('Error loading audio');
+  console.error('Error loading audio')
+}
+
+const nextSong = () => {
+  if (store.currentIndex < store.playlist.length - 1) {
+    store.playSongByIndex(store.currentIndex + 1)
+  }
+  else
+    store.playSongByIndex(0)
+}
+
+const previousSong = () => {
+  if (audio.value) {
+    if (audio.value.currentTime > 1) {
+      audio.value.currentTime = 0
+    } 
+    else if (store.currentIndex > 0) {
+      store.playSongByIndex(store.currentIndex - 1)
+    }
+    else {
+      store.playSongByIndex(store.playlist.length - 1)
+    }
+  }
 }
 </script>
 
 <template>
   <div class="bg-[#362323]">
     <div class="grid grid-cols-3 md:grid-cols-5 gap-2 text-white items-center">
-
       <div class="flex align-middle items-center">
-        <img class="rounded-3xl mr-[10px]" src="../assets/images/album.jpeg" width="70" height="70">
-        <div> 
-          <div class="text-white text-lg font-arial">{{ props.songName }}</div>
-          <div class="text-white text-xs font-arial">{{ props.artistName }}</div>
-        </div> 
+        <img
+          class="rounded-3xl mr-[10px]"
+          src="../assets/images/album.jpeg"
+          width="70"
+          height="70"
+        />
+        <div>
+          <div class="text-white text-lg font-arial">
+            {{ store.currentSong?.name || 'No song playing' }}
+          </div>
+          <div class="text-white text-xs font-arial">
+            {{ 'Unknown Artist' }}
+          </div>
+        </div>
       </div>
 
       <button class="hidden md:flex justify-center items-center h-full">
@@ -88,12 +126,21 @@ function handleAudioError() {
 
       <div class="flex flex-col items-center justify-center h-full">
         <div class="flex items-center">
-          <icon-button @click="previousSong"
-          iconName="bi-skip-backward-fill" class="mr-5 text-[22px]"></icon-button>
-          <icon-button @click="togglePlayPause"
-          :iconName="playing ? 'bi-pause-fill' : 'bi-play-fill'" 
-          class="text-[25px]"></icon-button>
-          <icon-button iconName="bi-skip-forward-fill" class="ml-5 text-[22px]"></icon-button>
+          <icon-button
+            @click="previousSong"
+            iconName="bi-skip-backward-fill"
+            class="mr-5 text-[22px]"
+          ></icon-button>
+          <icon-button
+            @click="togglePlayPause"
+            :iconName="playing ? 'bi-pause-fill' : 'bi-play-fill'"
+            class="text-[25px]"
+          ></icon-button>
+          <icon-button
+            @click="nextSong"
+            iconName="bi-skip-forward-fill"
+            class="ml-5 text-[22px]"
+          ></icon-button>
         </div>
 
         <div class="flex justify-center w-full mt-2">
@@ -101,15 +148,23 @@ function handleAudioError() {
         </div>
       </div>
 
-      <icon-button iconName="bi-repeat" class="hidden md:flex justify-center items-center h-full text-xl"></icon-button>
+      <icon-button
+        iconName="bi-repeat"
+        class="hidden md:flex justify-center items-center h-full text-xl"
+      ></icon-button>
 
       <div class="flex items-center">
         <icon-button iconName="bi-volume-up-fill mr-2 text-2xl"></icon-button>
-        <track-bar 
-          width="220" 
-          height="11" 
-          :percent="volume * 100" 
-          @input="(newVolume: number) => { volume = newVolume / 100; }">
+        <track-bar
+          width="220"
+          height="11"
+          :percent="volume * 100"
+          @input="
+            (newVolume: number) => {
+              volume = newVolume / 100
+            }
+          "
+        >
         </track-bar>
       </div>
     </div>

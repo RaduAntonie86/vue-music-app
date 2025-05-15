@@ -43,14 +43,21 @@ public class SongListService : ISongListService
     public async Task<List<Album>> GetAlbumList()
     {
         var query = @"SELECT * FROM public.album";
-        var albumList = await _dbService.GetAsync<List<Album>>(query, new{});
+        var albumList = await _dbService.GetAll<Album>(query, new { });
+        return albumList;
+    }
+    
+    public async Task<List<Album>> GetAlbumListByName(string name)
+    {
+        var query = @"SELECT * FROM public.album WHERE name ILIKE @Name";
+        var albumList = await _dbService.GetAll<Album>(query, new { Name = $"%{name}%" });
         return albumList;
     }
 
     public async Task<List<Playlist>> GetPlaylistList()
     {
         var query = @"SELECT * FROM public.playlist";
-        var playlistList = await _dbService.GetAll<Playlist>(query, new {});
+        var playlistList = await _dbService.GetAll<Playlist>(query, new { });
         return playlistList;
     }
     

@@ -5,13 +5,6 @@ import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import router from '@/router';
 
-  interface Playlist {
-    id: number;
-    name: string;
-    image_path: string;
-    description: string;
-  }
-
   const playlists = ref<Playlist[]>([]);
 
   const fetchPlaylists = async () => {

@@ -18,7 +18,7 @@
   // Function to fetch songs from the API
   const fetchSongs = async () => {
     try {
-      const response = await axios.get<Song[]>('http://localhost:5091/Songs');
+      const response = await axios.get<Song[]>('http://localhost:5091/Song');
       songs.value = response.data; // Update the reactive variable with fetched data
     } catch (error) {
       console.error('Error fetching songs:', error);

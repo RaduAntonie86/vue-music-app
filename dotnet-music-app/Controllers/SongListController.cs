@@ -25,6 +25,13 @@ public class SongListController : Controller
         return Ok(result);
     }
 
+    [HttpGet("albums/{name}")] // Explicit route for GetAlbumList
+    public async Task<IActionResult> GetAlbumListByName(string name)
+    {
+        var result = await _songListService.GetAlbumListByName(name);
+        return Ok(result);
+    }
+
     [HttpGet("playlists")] // Explicit route for GetPlaylistList
     public async Task<IActionResult> GetPlaylistList()
     {

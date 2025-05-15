@@ -35,6 +35,14 @@ public class SongController : Controller
         return Ok(result);
     }
     
+    [HttpGet("album_id/{album_id:int}")]
+    public async Task<IActionResult> GetSongsFromAlbum(int album_id)
+    {
+        var result =  await _songService.GetSongsFromAlbum(album_id);
+
+        return Ok(result);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> AddSong([FromBody]Song song)
     {

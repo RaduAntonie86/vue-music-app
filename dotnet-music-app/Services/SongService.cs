@@ -32,8 +32,17 @@ public class SongService : ISongService
     public async Task<List<Song>> GetSongsFromPlaylist(int playlist_id)
     {
         var songs = await _dbService.GetAll<Song>(
-            "SELECT s.* FROM song s JOIN playlist_songs ps ON ps.song_id = s.id WHERE ps.playlist_id = @PlaylistId",
+            "SELECT s.id, s.name, s.length FROM song s JOIN playlist_songs ps ON ps.song_id = s.id WHERE ps.playlist_id = @PlaylistId",
             new { PlaylistId = playlist_id }
+        );
+        return songs;
+    }
+
+    public async Task<List<Song>> GetSongsFromAlbum(int album_id)
+    {
+        var songs = await _dbService.GetAll<Song>(
+            "SELECT s.id, s.name, s.length FROM song s JOIN album_songs aso ON aso.song_id = s.id WHERE aso.album_id = @AlbumId",
+            new { AlbumId = album_id }
         );
         return songs;
     }

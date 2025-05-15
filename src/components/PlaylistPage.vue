@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
 import MusicPlayer from './MusicPlayer.vue';
 </script>
 
@@ -14,9 +13,6 @@ import MusicPlayer from './MusicPlayer.vue';
         <playlist-list class="sm:col-span-2 md:col-span-3 lg:col-span-5 xl:col-span-6"/>
         </div>
     </div>
-    <music-player :songId="1" 
-    :songName="'Unknown Song'"
-    :imagePath="'Unknown Path'"
-    :artistName="'Unknown Artist'"
+    <music-player
     class="p-2"></music-player>
 </template>

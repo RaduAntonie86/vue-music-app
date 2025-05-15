@@ -36,9 +36,10 @@ const router = createRouter({
       component: SignupPage
     },
     {
-      path: '/album',
+      path: '/album/:id',
       name: 'album',
-      component: AlbumPage
+      component: AlbumPage,
+      props: true
     }
   ]
 })

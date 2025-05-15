@@ -5,7 +5,6 @@ import { createPinia } from 'pinia'
 
 import MusicPlayer from './components/MusicPlayer.vue'
 import LeftSidebar from './components/LeftSidebar.vue'
-import PlaylistPage from './components/PlaylistList.vue'
 import LeftSideButtons from './components/LeftSideButtons.vue'
 import MainPage from './components/MainPage.vue'
 import SearchPage from './components/SearchPage.vue'
@@ -29,6 +28,7 @@ import SearchMenu from './components/SearchMenu.vue'
 import PlaylistList from './components/PlaylistList.vue'
 
 const app = createApp(App)
+app.use(createPinia())
 
 app.component('music-player', MusicPlayer)
 app.component('left-sidebar', LeftSidebar)
