@@ -44,7 +44,7 @@ const playlist = ref<Playlist>()
 const fetchPlaylist = async () => {
   try {
     const response = await axios.get<Playlist>(
-      `http://localhost:5091/SongList/playlist/${playlistId.value}`
+      `http://localhost:5091/Playlist/${playlistId.value}`
     )
     playlist.value = response.data
   } catch (error) {
@@ -93,7 +93,7 @@ const albums = ref<Album[]>([])
 const fetchPlaylistAlbums = async () => {
   try {
     const response = await axios.get<Album[]>(
-      `http://localhost:5091/SongList/albums/playlist_id/${playlistId.value}`
+      `http://localhost:5091/Album/playlist_id/${playlistId.value}`
     )
     albums.value = response.data
   } catch (error) {

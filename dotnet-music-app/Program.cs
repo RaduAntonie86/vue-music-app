@@ -6,7 +6,8 @@ builder.Services.AddScoped<IDbService, MusicAppDbService>();
 builder.Services.AddScoped<IDbService, MusicAppDbService>();
 builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ISongListService, SongListService>();
+builder.Services.AddScoped<IPlaylistService, PlaylistService>();
+builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

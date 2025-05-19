@@ -9,8 +9,8 @@ import router from '@/router';
 
   const fetchPlaylists = async () => {
     try {
-      const response = await axios.get<Playlist[]>('http://localhost:5091/Songlist/playlists');
-      playlists.value = response.data; // Update the reactive variable with fetched data
+      const response = await axios.get<Playlist[]>('http://localhost:5091/Playlist');
+      playlists.value = response.data;
     } catch (error) {
       console.error('Error fetching playlists:', error);
     }
