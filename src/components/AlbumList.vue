@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePlayerStore } from '@/usePlayerStore'
 import axios from 'axios'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
@@ -11,7 +11,6 @@ const albumId = ref(route.params.id)
 onMounted(() => {
   fetchAlbum()
   fetchAlbumSongs()
-  console.log('Album ID:', albumId.value)
 })
 
 const store = usePlayerStore()
@@ -19,7 +18,7 @@ const store = usePlayerStore()
 const playSong = (song: Song) => {
   const index = songs.value.findIndex((s) => s.id === song.id)
   if (index !== -1) {
-    store.setPlaylist(songs.value) // <-- this sets the full album to the global player
+    store.setPlaylist(songs.value)
     store.playSongByIndex(index)
   }
 }
@@ -46,9 +45,9 @@ const fetchAlbumSongs = async () => {
     const response = await axios.get<Song[]>(`http://localhost:5091/Song/album_id/${albumId.value}`)
     songs.value = response.data
 
-    songs.value.forEach((song, index) => {
-      song.index = index + 1
-    })
+    for (const song of response.data) {
+      await fetchSongArtists(song.id)
+    }
   } catch (error) {
     console.error('Error fetching songs from album:', error)
   }
@@ -64,6 +63,34 @@ const fetchAlbum = async () => {
     console.error('Error fetching songs from playlist:', error)
   }
 }
+
+const songArtists = ref<Record<number, User[]>>({})
+
+const fetchSongArtists = async (songId: number) => {
+  try {
+    const response = await axios.get<User[]>(`http://localhost:5091/User/song_id/${songId}`)
+    songArtists.value[songId] = response.data
+  } catch (error) {
+    console.error(`Error fetching artists for album ${songId}:`, error)
+  }
+}
+
+const albumArtists = computed(() => {
+  const seen = new Set<number>()
+  const allArtists: User[] = []
+
+  for (const artistList of Object.values(songArtists.value)) {
+    for (const artist of artistList) {
+      if (!seen.has(artist.id)) {
+        seen.add(artist.id)
+        allArtists.push(artist)
+      }
+    }
+  }
+
+  return allArtists
+})
+
 </script>
 
 <template>
@@ -83,10 +110,15 @@ const fetchAlbum = async () => {
             height="30"
           />
           <div>
-            <div class="text-white text-md font-arial mr-1">Artist,</div>
+            <div v-if="albumArtists.length > 0" class="flex flex-wrap gap-x-1">
+              <button v-for="(user) in albumArtists" :key="user.id" class="hover:text-[#888888]">
+                {{ user.displayName }}<span>,</span>
+              </button>
+            </div>
+            <div v-else>Unknown Artist</div>
           </div>
           <div>
-            <div class="text-white text-md font-arial">{{ album?.release_date || 'Unknown' }}</div>
+            <div class="text-white text-md font-arial ml-2">{{ album?.releaseDate || 'Unknown' }}</div>
           </div>
         </div>
       </div>
@@ -111,24 +143,31 @@ const fetchAlbum = async () => {
     </div>
     <PerfectScrollbar class="overflow-hidden min-h-[43vh]">
       <button
-        v-for="song in songs"
-        :key="song.index"
+        v-for="(song, index) in songs"
+        :key="song.id"
         @click="playSong(song)"
-        class="w-full text-left cursor-pointer focus:outline-none grid grid-cols-7 gap-4 p-2 mx-2 font-arial font-bold hover:text-[#888888]"
-      >
-        <div class="flex place-items-center font-normal">{{ song.index }}</div>
-        <div class="col-span-2">
-          <div class="flex align-middle place-items-center mb-2 mt-2">
-            <div>
-              <div class="text-lg font-arial">{{ song.name }}</div>
-              <div class="text-xs font-arial font-normal">Artist Name</div>
+        class="w-full text-left cursor-pointer focus:outline-none grid grid-cols-7 gap-4 p-2 mx-2 font-arial font-bold hover:text-[#888888]">
+          <div class="flex place-items-center font-normal">{{ index + 1 }}</div>
+          <div class="col-span-2">
+            <div class="flex align-middle place-items-center mb-2 mt-2">
+              <div>
+                <div class="text-lg font-arial">{{ song.name }}</div>
+                <div class="text-xs font-arial font-normal">
+                  <div v-if="songArtists[songs[index]?.id]">
+                    <span v-for="(artist, idx) in songArtists[songs[index].id]" :key="artist.id">
+                      {{ artist.displayName }}
+                      <span v-if="idx < songArtists[songs[index].id].length - 1">, </span>
+                    </span>
+                  </div>
+                  <div v-else>Unknown Artist</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col-span-2 flex place-items-center font-normal">Number of plays</div>
-        <div class="col-span-2 flex place-items-center font-normal">
-          {{ formatLength(song.length) }}
-        </div>
+          <div class="col-span-2 flex place-items-center font-normal">{{ song.listens }}</div>
+          <div class="col-span-2 flex place-items-center font-normal">
+            {{ formatLength(song.length) }}
+          </div>
       </button>
     </PerfectScrollbar>
   </div>

@@ -22,6 +22,17 @@ public class UserService : IUserService
         return UserList;
     }
 
+    public async Task<List<User>> GetUsersFromPlaylist(int playlist_id)
+    {
+        var UserList = await _dbService.GetAll<User>("SELECT us.id, us.display_name AS \"DisplayName\" FROM public.\"user\" us JOIN playlist_users pu ON pu.user_id = us.id WHERE pu.playlist_id = @PlaylistId", new { PlaylistId = playlist_id });
+        return UserList;
+    }
+
+    public async Task<List<User>> GetUsersFromSong(int song_id)
+    {
+        var UserList = await _dbService.GetAll<User>("SELECT us.id, us.display_name AS \"DisplayName\" FROM public.\"user\" us JOIN song_artists sa ON sa.artist_id = us.id WHERE sa.song_id = @SongID", new { SongId = song_id });
+        return UserList;
+    }
 
     public async Task<User> GetUser(int id)
     {

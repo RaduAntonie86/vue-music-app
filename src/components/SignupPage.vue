@@ -2,12 +2,10 @@
 import router from '@/router'
 import { ref } from 'vue'
 
-// Reactive variables
 const display_name = ref('')
 const username = ref('')
 const password = ref('')
 
-// Submit handler
 const handleSignup = async () => {
   if (!username.value || !password.value) {
     alert('Please fill in both username and password.')

@@ -1,4 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import MusicPlayer from './components/MusicPlayer.vue'
+
+const route = useRoute()
+
+const hidePlayerRoutes = ['/login', '/signup']
+
+const showPlayer = computed(() => {
+  return route?.path && !hidePlayerRoutes.includes(route.path)
+})
 </script>
 
 <template>
@@ -8,5 +19,6 @@
       <RouterLink to="/login" class="font-arial text-white no-underline mb-3 text-5xl font-semibold text-right">Log In</RouterLink>
     </div>
     <RouterView/>
+    <MusicPlayer v-if="showPlayer" class="p-2" />
   </div>
 </template>

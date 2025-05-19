@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 public class UserController : Controller
 {
-    private readonly IUserService _userService;  // Change from _songService to _userService
+    private readonly IUserService _userService;
 
-    public UserController(IUserService userService)  // Change parameter name to userService
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
@@ -14,7 +14,7 @@ public class UserController : Controller
     [HttpGet]
     public async Task<IActionResult> GetUserList()
     {
-        var result = await _userService.GetUserList(); // Change _songService to _userService
+        var result = await _userService.GetUserList();
 
         return Ok(result);
     }
@@ -22,23 +22,39 @@ public class UserController : Controller
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetUser(int id)
     {
-        var result = await _userService.GetUser(id); // Change _songService to _userService
+        var result = await _userService.GetUser(id);
 
         return Ok(result);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddUser([FromBody] User user)  // Change parameter name to user
+    [HttpGet("playlist_id/{playlist_id:int}")]
+    public async Task<IActionResult> GetUsersFromPlaylist(int playlist_id)
     {
-        var result = await _userService.CreateUser(user);  // Change _songService to _userService
+        var result = await _userService.GetUsersFromPlaylist(playlist_id);
+
+        return Ok(result);
+    }
+
+
+    [HttpGet("song_id/{song_id:int}")]
+    public async Task<IActionResult> GetUsersFromSong(int song_id)
+    {
+        var result = await _userService.GetUsersFromSong(song_id);
+
+        return Ok(result);
+    }
+    [HttpPost]
+    public async Task<IActionResult> AddUser([FromBody] User user)
+    {
+        var result = await _userService.CreateUser(user);
 
         return Ok(result);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateUser([FromBody] User user)  // Change parameter name to user
+    public async Task<IActionResult> UpdateUser([FromBody] User user)
     {
-        var result = await _userService.UpdateUser(user);  // Change _songService to _userService
+        var result = await _userService.UpdateUser(user);
 
         return Ok(result);
     }
@@ -46,7 +62,7 @@ public class UserController : Controller
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
-        var result = await _userService.DeleteUser(id);  // Change _songService to _userService
+        var result = await _userService.DeleteUser(id);
 
         return Ok(result);
     }

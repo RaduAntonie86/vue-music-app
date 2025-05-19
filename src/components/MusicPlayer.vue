@@ -5,21 +5,22 @@ import { usePlayerStore } from '@/usePlayerStore'
 
 const store = usePlayerStore()
 
-// Create a ref for the audio element
 const audio = ref<HTMLAudioElement | null>(null)
 
 const songPath = computed(() =>
   store.currentSong ? `http://localhost:5091/Song/stream/${store.currentSong.id}` : ''
 )
 
-// Use media controls with the song's src property
 const { playing, volume } = useMediaControls(audio)
 
 const currentSong = computed(() => store.currentSong)
 
+watch(() => store.playlist, (val) => {
+  console.log('Playlist changed', val.map((s) => s.name))
+})
+
 watch(currentSong, (newSong) => {
   if (newSong && audio.value) {
-    // Wait until the audio is ready before trying to play
     const tryPlay = () => {
       audio.value?.play()
         .then(() => {
@@ -29,15 +30,18 @@ watch(currentSong, (newSong) => {
           console.error('Autoplay failed:', err)
         })
 
-      // Remove listener after firing
       audio.value?.removeEventListener('canplay', tryPlay)
     }
 
-    // Attach listener once, then try to play
     audio.value.addEventListener('canplay', tryPlay, { once: true })
     
-    // Force reload the audio when the src changes
     audio.value.load()
+  }
+})
+
+watch(audio, (el) => {
+  if (el) {
+    el.addEventListener('ended', nextSong)
   }
 })
 
@@ -55,12 +59,10 @@ function playSong() {
   }
 }
 
-// Function to pause the song
 function pauseSong() {
   if (audio.value) {
     playing.value = false
     audio.value.pause()
-    //console.log("Audio is paused");
   }
 }
 
@@ -72,7 +74,6 @@ function togglePlayPause() {
   }
 }
 
-// Function to handle audio errors
 function handleAudioError() {
   console.error('Error loading audio')
 }
@@ -81,11 +82,19 @@ const nextSong = () => {
   if (store.currentIndex < store.playlist.length - 1) {
     store.playSongByIndex(store.currentIndex + 1)
   }
+  else if(repeat.value)
+    store.playSongByIndex(0)
+}
+
+const selectNextSong = () =>{
+  if (store.currentIndex < store.playlist.length - 1) {
+    store.playSongByIndex(store.currentIndex + 1)
+  }
   else
     store.playSongByIndex(0)
 }
 
-const previousSong = () => {
+const selectPreviousSong = () => {
   if (audio.value) {
     if (audio.value.currentTime > 1) {
       audio.value.currentTime = 0
@@ -98,11 +107,27 @@ const previousSong = () => {
     }
   }
 }
+const repeat = ref(false)
+
+const shuffle = ref(false)
+
+function toggleRepeat() {
+  repeat.value = !repeat.value
+}
+
+function toggleShuffle() {
+  shuffle.value = !shuffle.value
+  if (shuffle.value) {
+    store.shufflePlaylist()
+  } else {
+    store.restoreOriginalOrder()
+  }
+}
 </script>
 
 <template>
   <div class="bg-[#362323]">
-    <div class="grid grid-cols-3 md:grid-cols-5 gap-2 text-white items-center">
+    <div class="grid grid-cols-3 md:grid-cols-5 gap-2 items-center">
       <div class="flex align-middle items-center">
         <img
           class="rounded-3xl mr-[10px]"
@@ -120,26 +145,30 @@ const previousSong = () => {
         </div>
       </div>
 
-      <button class="hidden md:flex justify-center items-center h-full">
-        <i class="bi bi-shuffle text-xl text-white"></i>
-      </button>
+      <icon-button
+        iconName="bi-shuffle"
+        @click="toggleShuffle"
+        :class="['hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
+        shuffle ? 'text-[#888888]' : 'text-white'
+        ]"
+      ></icon-button>
 
       <div class="flex flex-col items-center justify-center h-full">
         <div class="flex items-center">
           <icon-button
-            @click="previousSong"
+            @click="selectPreviousSong"
             iconName="bi-skip-backward-fill"
-            class="mr-5 text-[22px]"
+            class="mr-5 text-[22px] text-white hover:text-2xl"
           ></icon-button>
           <icon-button
             @click="togglePlayPause"
             :iconName="playing ? 'bi-pause-fill' : 'bi-play-fill'"
-            class="text-[25px]"
+            class="text-[25px] text-white hover:text-2xl"
           ></icon-button>
           <icon-button
-            @click="nextSong"
+            @click="selectNextSong"
             iconName="bi-skip-forward-fill"
-            class="ml-5 text-[22px]"
+            class="ml-5 text-[22px] text-white hover:text-2xl"
           ></icon-button>
         </div>
 
@@ -150,11 +179,14 @@ const previousSong = () => {
 
       <icon-button
         iconName="bi-repeat"
-        class="hidden md:flex justify-center items-center h-full text-xl"
+        @click="toggleRepeat"
+        :class="['hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
+        repeat ? 'text-[#888888]' : 'text-white'
+        ]"
       ></icon-button>
 
       <div class="flex items-center">
-        <icon-button iconName="bi-volume-up-fill mr-2 text-2xl"></icon-button>
+        <icon-button iconName="bi-volume-up-fill mr-2 text-white text-2xl hover:text-3xl"></icon-button>
         <track-bar
           width="220"
           height="11"

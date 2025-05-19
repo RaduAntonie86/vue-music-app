@@ -13,6 +13,4 @@ import MusicPlayer from './MusicPlayer.vue';
         <playlist-list class="sm:col-span-2 md:col-span-3 lg:col-span-5 xl:col-span-6"/>
         </div>
     </div>
-    <music-player
-    class="p-2"></music-player>
 </template>

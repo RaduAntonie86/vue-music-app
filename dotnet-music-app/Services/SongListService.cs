@@ -34,7 +34,7 @@ public class SongListService : ISongListService
 
     public async Task<Album> GetAlbum(int id)
     {
-        var query = @"SELECT * FROM public.album where id=@Id";
+        var query = @"SELECT id, name, image_path AS ImagePath, release_date AS ReleaseDate FROM public.album where id=@Id";
         var parameters = new {id};
         var album = await _dbService.GetAsync<Album>(query, parameters);
         return album;
@@ -44,6 +44,12 @@ public class SongListService : ISongListService
     {
         var query = @"SELECT * FROM public.album";
         var albumList = await _dbService.GetAll<Album>(query, new { });
+        return albumList;
+    }
+
+    public async Task<List<Album>> GetAlbumsFromPlaylist(int playlist_id)
+    {
+        var albumList = await _dbService.GetAll<Album>("SELECT a.id, a.name, a.image_path AS imagePath FROM playlist_songs ps JOIN album_songs aso ON ps.song_id = aso.song_id JOIN album a ON aso.album_id = a.id WHERE ps.playlist_id = @PlaylistId;", new { PlaylistId = playlist_id });
         return albumList;
     }
     

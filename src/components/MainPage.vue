@@ -4,28 +4,17 @@
   import axios from 'axios';
   import albumImage from '@/assets/images/album.jpeg';
 
-  // Define the type for an song
-  interface Song {
-    name: string;
-    length: number;
-    listens: number;
-    path: string;
-  }
-
-  // Define a reactive variable for songs
   const songs = ref<Song[]>([]);
 
-  // Function to fetch songs from the API
   const fetchSongs = async () => {
     try {
       const response = await axios.get<Song[]>('http://localhost:5091/Song');
-      songs.value = response.data; // Update the reactive variable with fetched data
+      songs.value = response.data;
     } catch (error) {
       console.error('Error fetching songs:', error);
     }
   };
 
-  // Fetch songs when the component is mounted
   onMounted(() => {
     fetchSongs();
   });
