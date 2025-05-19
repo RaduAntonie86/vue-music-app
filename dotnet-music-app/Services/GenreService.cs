@@ -16,28 +16,28 @@ public class GenreService : IGenreService
         return true;
     }
 
-    public async Task<List<Genre>> GetGenreList()
+    public async Task<List<GenreDto>> GetGenreList()
     {
         var query = @"SELECT * FROM public.genre";
         var genreList = await _dbService.GetAll<Genre>(query, new{});
-        return genreList;
+        return genreList.Select(GenreDto.CopyGenreToDto).ToList();
     }
 
 
-    public async Task<Genre> GetGenre(int id)
+    public async Task<GenreDto> GetGenre(int id)
     {
         var query = @"SELECT * FROM public.genre where id=@Id";
         var genre = await _dbService.GetAsync<Genre>(query, new{});
-        return genre;
+        return GenreDto.CopyGenreToDto(genre);
     }
 
-    public async Task<Genre> UpdateGenre(Genre genre)
+    public async Task<GenreDto> UpdateGenre(Genre genre)
     {
         var query = @"UPDATE public.genre 
                       SET name=@Name, 
                       WHERE id=@Id";
         await _dbService.EditData(query, genre);
-        return genre;
+        return GenreDto.CopyGenreToDto(genre);
     }
 
     public async Task<bool> DeleteGenre(int id)

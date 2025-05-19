@@ -1,6 +1,6 @@
 public class User
 {
-    public string? Id { get; set; }
+    public required int Id { get; set; }
     public required string DisplayName { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
@@ -8,7 +8,7 @@ public class User
     public string? Description { get; set; }
     public List<int>? ListeningHistory { get; set; }
     public User() { }
-    public User(string id, string displayName, string username, string password, string imagePath = "", string description = "")
+    public User(int id, string displayName, string username, string password, string imagePath = "", string description = "")
     {
         Id = id;
         DisplayName = displayName;

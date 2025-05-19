@@ -14,4 +14,15 @@ public class SongDto
         Listens = listens;
         Path = path;
     }
+    public static SongDto CopySongToDto(Song song)
+    {
+        return new SongDto
+        {
+            Id = song.Id,
+            Name = song.Name,
+            Length = song.Length,
+            Listens = song.Listens,
+            Path = song.Path
+        };
+    }
 }

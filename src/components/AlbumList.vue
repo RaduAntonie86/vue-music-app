@@ -60,7 +60,7 @@ const album = ref<Album>()
 
 const fetchAlbum = async () => {
   try {
-    const response = await axios.get<Album>(`http://localhost:5091/SongList/album/${albumId.value}`)
+    const response = await axios.get<Album>(`http://localhost:5091/Album/${albumId.value}`)
     album.value = response.data
   } catch (error) {
     console.error('Error fetching songs from playlist:', error)

@@ -19,35 +19,35 @@ public class AlbumService : IAlbumService
         return true;
     }
 
-    public async Task<Album> GetAlbum(int id)
+    public async Task<AlbumDto> GetAlbum(int id)
     {
         var query = @"SELECT id, name, image_path AS ImagePath, release_date AS ReleaseDate FROM public.album where id=@Id";
         var parameters = new {id};
         var album = await _dbService.GetAsync<Album>(query, parameters);
-        return album;
+        return AlbumDto.CopyAlbumToDto(album);
     }
 
-    public async Task<List<Album>> GetAlbumList()
+    public async Task<List<AlbumDto>> GetAlbumList()
     {
         var query = @"SELECT * FROM public.album";
         var albumList = await _dbService.GetAll<Album>(query, new { });
-        return albumList;
+        return albumList.Select(AlbumDto.CopyAlbumToDto).ToList();
     }
 
-    public async Task<List<Album>> GetAlbumsFromPlaylist(int playlist_id)
+    public async Task<List<AlbumDto>> GetAlbumsFromPlaylist(int playlist_id)
     {
         var albumList = await _dbService.GetAll<Album>("SELECT a.id, a.name, a.image_path AS imagePath FROM playlist_songs ps JOIN album_songs aso ON ps.song_id = aso.song_id JOIN album a ON aso.album_id = a.id WHERE ps.playlist_id = @PlaylistId;", new { PlaylistId = playlist_id });
-        return albumList;
+        return albumList.Select(AlbumDto.CopyAlbumToDto).ToList();
     }
     
-    public async Task<List<Album>> GetAlbumListByName(string name)
+    public async Task<List<AlbumDto>> GetAlbumListByName(string name)
     {
         var query = @"SELECT * FROM public.album WHERE name ILIKE @Name";
         var albumList = await _dbService.GetAll<Album>(query, new { Name = $"%{name}%" });
-        return albumList;
+        return albumList.Select(AlbumDto.CopyAlbumToDto).ToList();
     }
 
-    public async Task<SongList> UpdateAlbum(Album album)
+    public async Task<AlbumDto> UpdateAlbum(Album album)
     {
         var query = @"UPDATE public.album (id, release_date, name, image_path) 
                 SET id=@Id, 
@@ -56,7 +56,7 @@ public class AlbumService : IAlbumService
                     image_path=@ImagePath";
         var parameters = album;
         await _dbService.EditData(query, parameters);
-        return album;
+        return AlbumDto.CopyAlbumToDto(album);
     }
 
     public async Task<bool> DeleteAlbum(int id)

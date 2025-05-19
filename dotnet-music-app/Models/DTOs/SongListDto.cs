@@ -5,6 +5,7 @@ public class SongListDto
     public string ImagePath { get; set; }
     public List<int> SongIds { get; set; }
     public int UserId { get; set; }
+    public SongListDto() { }
     protected SongListDto(int id, string name, string imagePath, List<int> songIds, int userId)
     {
         Id = id;
@@ -13,14 +14,15 @@ public class SongListDto
         SongIds = songIds;
         UserId = userId;
     }
-    public SongListDto CopySongListToDto(SongList songList)
+    public static SongListDto CopySongListToDto(SongList songList)
     {
-        return new SongListDto(
-            songList.Id, 
-            songList.Name, 
-            songList.ImagePath, 
-            songList.SongIds, 
-            songList.UserId
-        );
+        return new SongListDto
+        {
+            Id = songList.Id,
+            Name = songList.Name,
+            ImagePath = songList.ImagePath,
+            SongIds = songList.SongIds,
+            UserId = songList.UserId
+        };
     }
 }

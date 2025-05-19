@@ -19,7 +19,7 @@ const albums = ref<Album[]>([])
 const searchAlbums = async () => {
   try {
     const response = await axios.get<Album[]>(
-      `http://localhost:5091/SongList/albums/${currentSearch.value}`
+      `http://localhost:5091/Album/${currentSearch.value}`
     )
     albums.value = response.data
   } catch (error) {

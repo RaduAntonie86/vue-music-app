@@ -7,11 +7,13 @@ public class GenreDto
         Id = id;
         Name = name;
     }
-    public GenreDto CopyGenreToDto(Genre genre)
+    public GenreDto() { }
+    public static GenreDto CopyGenreToDto(Genre genre)
     {
-        return new GenreDto(
-            genre.Id,
-            genre.Name
-        );
+        return new GenreDto
+        {
+            Id = genre.Id,
+            Name = genre.Name
+        };
     }
 }

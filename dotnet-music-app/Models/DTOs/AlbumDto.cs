@@ -14,16 +14,18 @@ public class AlbumDto : SongListDto
         ReleaseDate = releaseDate;
         GenreIds = genreIds;
     }
-    public AlbumDto CopyAlbumToDto(Album album)
+    public AlbumDto(): base() { }
+    public static AlbumDto CopyAlbumToDto(Album album)
     {
-        return new AlbumDto(
-            album.Id,
-            album.Name,
-            album.ImagePath,
-            album.SongIds,
-            album.UserId,
-            album.ReleaseDate,
-            album.GenreIds
-        );
+        return new AlbumDto
+        {
+            Id = album.Id,
+            Name = album.Name,
+            ImagePath = album.ImagePath,
+            SongIds = album.SongIds,
+            UserId = album.UserId,
+            ReleaseDate = album.ReleaseDate,
+            GenreIds = album.GenreIds
+        };
     }
 }

@@ -17,22 +17,22 @@ public class PlaylistService : IPlaylistService
         return true;
     }
 
-    public async Task<List<Playlist>> GetPlaylistList()
+    public async Task<List<PlaylistDto>> GetPlaylistList()
     {
         var query = @"SELECT * FROM public.playlist";
         var playlistList = await _dbService.GetAll<Playlist>(query, new { });
-        return playlistList;
+        return playlistList.Select(PlaylistDto.CopyPlaylistToDto).ToList();
     }
     
-    public async Task<Playlist> GetPlaylist(int id)
+    public async Task<PlaylistDto> GetPlaylist(int id)
     {
         var query = @"SELECT * FROM public.playlist where id=@Id";
         var parameters = new { id };
         var playlist = await _dbService.GetAsync<Playlist>(query, parameters);
-        return playlist;
+        return PlaylistDto.CopyPlaylistToDto(playlist);
     }
 
-    public async Task<SongList> UpdatePlaylist(Playlist playlist)
+    public async Task<PlaylistDto> UpdatePlaylist(Playlist playlist)
     {
         var query = @"INSERT INTO public.playlist (id, description, name, image_path) 
                 SET id=@Id, 
@@ -41,7 +41,7 @@ public class PlaylistService : IPlaylistService
                     image_path=@ImagePath)";
         var parameters = playlist;
         await _dbService.EditData(query, parameters);
-        return playlist;
+        return PlaylistDto.CopyPlaylistToDto(playlist);
     }
     public async Task<bool> DeletePlaylist(int id)
     {

@@ -12,15 +12,17 @@ public class PlaylistDto : SongListDto
     {
         Description = description;
     }
-    public PlaylistDto CopyPlaylistToDto(Playlist playlist)
+    public PlaylistDto(): base() { }
+    public static PlaylistDto CopyPlaylistToDto(Playlist playlist)
     {
-        return new PlaylistDto(
-            playlist.Id, 
-            playlist.Name, 
-            playlist.ImagePath, 
-            playlist.SongIds, 
-            playlist.UserId, 
-            playlist.Description
-        );
+        return new PlaylistDto
+        {
+            Id = playlist.Id,
+            Name = playlist.Name,
+            ImagePath = playlist.ImagePath,
+            SongIds = playlist.SongIds,
+            UserId = playlist.UserId,
+            Description = playlist.Description
+        };
     }
 }
