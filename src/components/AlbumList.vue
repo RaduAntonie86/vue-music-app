@@ -18,7 +18,10 @@ const store = usePlayerStore()
 const playSong = (song: Song) => {
   const index = songs.value.findIndex((s) => s.id === song.id)
   if (index !== -1) {
-    store.setPlaylist(songs.value)
+    store.setPlaylist(
+      songs.value,
+      songs.value.map(song => songArtists.value[song.id] || [])
+    )
     store.playSongByIndex(index)
   }
 }

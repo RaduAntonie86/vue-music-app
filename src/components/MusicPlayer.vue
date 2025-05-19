@@ -39,12 +39,28 @@ watch(currentSong, (newSong) => {
   }
 })
 
+const currentTime = ref(0)
+const duration = ref(0)
+
 watch(audio, (el) => {
   if (el) {
+    el.addEventListener('timeupdate', () => {
+      currentTime.value = el.currentTime
+    })
+    el.addEventListener('loadedmetadata', () => {
+      duration.value = el.duration
+    })
     el.addEventListener('ended', nextSong)
   }
 })
 
+function seekAudio(percent: number) {
+  if (audio.value && duration.value) {
+    const newTime = (percent / 100) * duration.value
+    audio.value.currentTime = newTime
+    currentTime.value = newTime
+  }
+}
 
 function playSong() {
   if (audio.value) {
@@ -111,6 +127,9 @@ const repeat = ref(false)
 
 const shuffle = ref(false)
 
+const muted = ref(false)
+const previousVolume = ref(volume.value)
+
 function toggleRepeat() {
   repeat.value = !repeat.value
 }
@@ -122,6 +141,20 @@ function toggleShuffle() {
   } else {
     store.restoreOriginalOrder()
   }
+}
+
+function toggleMute() {
+  muted.value = !muted.value
+  if (muted.value) {
+    previousVolume.value = volume.value
+    volume.value = 0
+  } else {
+    volume.value = previousVolume.value || 0.5
+  }
+}
+
+function setVolume(newPercent: number) {
+  volume.value = newPercent / 100;
 }
 </script>
 
@@ -139,9 +172,9 @@ function toggleShuffle() {
           <div class="text-white text-lg font-arial">
             {{ store.currentSong?.name || 'No song playing' }}
           </div>
-          <div class="text-white text-xs font-arial">
-            {{ 'Unknown Artist' }}
-          </div>
+            <div class="text-white text-xs font-arial">
+              {{ store.currentArtists.map(artist => artist.displayName).join(', ') || 'Unknown Artist' }}
+            </div>
         </div>
       </div>
 
@@ -173,7 +206,12 @@ function toggleShuffle() {
         </div>
 
         <div class="flex justify-center w-full mt-2">
-          <track-bar width="250" height="9" percent="55"></track-bar>
+          <track-bar
+            width="250"
+            height="9"
+            :percent="(currentTime / duration) * 100"
+            @input="seekAudio"
+          />
         </div>
       </div>
 
@@ -186,18 +224,16 @@ function toggleShuffle() {
       ></icon-button>
 
       <div class="flex items-center">
-        <icon-button iconName="bi-volume-up-fill mr-2 text-white text-2xl hover:text-3xl"></icon-button>
+        <icon-button 
+            :iconName="muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
+            @click="toggleMute"
+            class="mr-2 text-white text-2xl hover:text-3xl"></icon-button>
         <track-bar
           width="220"
           height="11"
           :percent="volume * 100"
-          @input="
-            (newVolume: number) => {
-              volume = newVolume / 100
-            }
-          "
-        >
-        </track-bar>
+          @input="setVolume"
+        />
       </div>
     </div>
   </div>
