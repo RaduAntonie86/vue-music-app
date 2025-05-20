@@ -3,17 +3,17 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import MusicPlayer from './components/MusicPlayer.vue'
-import LeftSidebar from './components/LeftSidebar.vue'
-import LeftSideButtons from './components/LeftSideButtons.vue'
+import MusicPlayer from './components/layout/MusicPlayer.vue'
+import LeftSidebar from './components/layout/LeftSidebar.vue'
+import LeftSideButtons from './components/layout/LeftSideButtons.vue'
 import MainPage from './features/main/MainPage.vue'
 import SearchPage from './features/search/SearchPage.vue'
-import AlbumPage from './features/auth/album/AlbumList.vue'
-import AlbumPreview from './features/auth/album/AlbumPreview.vue'
+import AlbumPage from './features/album/AlbumPage.vue'
+import AlbumPreview from './features/album/AlbumPreview.vue'
 import TrackBar from './components/common/TrackBar.vue'
 import PlaylistPreview from './features/playlist/PlaylistPreview.vue'
 import IconButton from './components/common/IconButton.vue'
-import Albums from './features/auth/album/AlbumList.vue'
+import Albums from './features/album/AlbumList.vue'
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"

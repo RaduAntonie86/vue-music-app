@@ -164,7 +164,7 @@ function setVolume(newPercent: number) {
       <div class="flex align-middle items-center">
         <img
           class="rounded-3xl mr-[10px]"
-          src="../assets/images/album.jpeg"
+          src="../../assets/images/album.jpeg"
           width="70"
           height="70"
         />

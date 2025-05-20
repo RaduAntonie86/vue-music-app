@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/features/auth/authStore'
-import MusicPlayer from './components/MusicPlayer.vue'
+import MusicPlayer from './components/layout/MusicPlayer.vue'
 
 const authStore = useAuthStore()
 const route = useRoute()

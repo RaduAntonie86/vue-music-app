@@ -116,7 +116,7 @@ const fetchSongArtists = async (songId: number) => {
 <template>
   <div class="bg-[#362323] rounded-md">
     <div class="flex align-middle place-items-center p-4">
-      <img class="rounded-3xl mr-4" src="../assets/images/album.jpeg" width="250" height="250" />
+      <img class="rounded-3xl mr-4" src="../../assets/images/album.jpeg" width="250" height="250" />
       <div class="mt-[50px]">
         <div class="text-white text-lg font-arial mb-1">Playlist</div>
         <div class="text-white text-6xl font-semibold font-arial mb-1">
@@ -127,7 +127,7 @@ const fetchSongArtists = async (songId: number) => {
         </div>
         <div class="text-white text-lg font-arial">Made by:</div>
         <div class="flex align-middle place-items-center mb-2 mt-2">
-          <img class="rounded-full mr-2.5" src="../assets/images/user.jpg" width="30" height="30" />
+          <img class="rounded-full mr-2.5" src="../../assets/images/user.jpg" width="30" height="30" />
           <div class="flex items-center text-white text-md font-arial">
             <div v-if="users.length > 0" class="flex flex-wrap gap-x-1">
               <div class="hover:text-[#888888]" v-for="(user, index) in users" :key="index">
@@ -172,7 +172,7 @@ const fetchSongArtists = async (songId: number) => {
             <div class="flex align-middle place-items-center mb-2 mt-2">
               <img
                 class="rounded-lg mr-2.5"
-                src="../assets/images/album.jpeg"
+                src="../../assets/images/album.jpeg"
                 width="50"
                 height="50"
               />
