@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useMediaControls } from '@vueuse/core'
-import { usePlayerStore } from '@/usePlayerStore'
+import { usePlayerStore } from '@/stores/usePlayerStore'
 
 const store = usePlayerStore()
 

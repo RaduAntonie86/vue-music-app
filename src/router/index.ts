@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PlaylistPage from '@/components/PlaylistPage.vue'
-import AppPage from '@/components/AppPage.vue'
-import SearchPage from '@/components/SearchPage.vue'
-import AlbumPage from '@/components/AlbumPage.vue'
-import LoginPage from '@/components/LoginPage.vue'
-import SignupPage from '@/components/SignupPage.vue'
+import PlaylistPage from '@/features/playlist/PlaylistPage.vue'
+import AppPage from '@/features/main/AppPage.vue'
+import SearchPage from '@/features/search/SearchPage.vue'
+import AlbumPage from '@/features/album/AlbumPage.vue'
+import LoginPage from '@/features/auth/LoginPage.vue'
+import SignupPage from '@/features/auth/SignupPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

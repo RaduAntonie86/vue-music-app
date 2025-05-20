@@ -6,14 +6,14 @@ import { createPinia } from 'pinia'
 import MusicPlayer from './components/MusicPlayer.vue'
 import LeftSidebar from './components/LeftSidebar.vue'
 import LeftSideButtons from './components/LeftSideButtons.vue'
-import MainPage from './components/MainPage.vue'
-import SearchPage from './components/SearchPage.vue'
-import AlbumPage from './components/AlbumList.vue'
-import AlbumPreview from './components/AlbumPreview.vue'
-import TrackBar from './components/TrackBar.vue'
-import PlaylistPreview from './components/PlaylistPreview.vue'
-import IconButton from './components/IconButton.vue'
-import Albums from './components/AlbumList.vue'
+import MainPage from './features/main/MainPage.vue'
+import SearchPage from './features/search/SearchPage.vue'
+import AlbumPage from './features/auth/album/AlbumList.vue'
+import AlbumPreview from './features/auth/album/AlbumPreview.vue'
+import TrackBar from './components/common/TrackBar.vue'
+import PlaylistPreview from './features/playlist/PlaylistPreview.vue'
+import IconButton from './components/common/IconButton.vue'
+import Albums from './features/auth/album/AlbumList.vue'
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
@@ -24,8 +24,8 @@ import 'vue3-perfect-scrollbar/style.css';
 
 import App from './App.vue'
 import router from './router'
-import SearchMenu from './components/SearchMenu.vue'
-import PlaylistList from './components/PlaylistList.vue'
+import SearchMenu from './features/search/SearchMenu.vue'
+import PlaylistList from './features/playlist/PlaylistList.vue'
 
 const app = createApp(App)
 app.use(createPinia())

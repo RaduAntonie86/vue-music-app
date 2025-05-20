@@ -1,36 +1,42 @@
 <script setup lang="ts">
 import router from '@/router'
 import { ref } from 'vue'
+import { useAuthStore } from '@/features/auth/authStore'
 
-const display_name = ref('')
+const authStore = useAuthStore()
+
+const rememberMe = ref(false)
 const username = ref('')
 const password = ref('')
 
-const handleSignup = async () => {
+const handleLogin = async () => {
   if (!username.value || !password.value) {
     alert('Please fill in both username and password.')
     return
   }
+
   try {
-    const response = await fetch('http://localhost:5091/User', {
+    const response = await fetch('http://localhost:5091/Auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        displayName: display_name.value,
         username: username.value,
-        password: password.value,
+        password: password.value
       })
     })
 
-    if (!response.ok) throw new Error('Sign up failed')
+    if (!response.ok) throw new Error('Login failed')
 
     const data = await response.json()
-    console.log('Sign up success:', data)
-    router.push("/");
+
+    authStore.setToken(data.token, rememberMe.value)
+
+    console.log('Log in success:', data)
+    router.push("/")
   } catch (error) {
-    console.error('', error)
+    console.error('Login error:', error)
   }
 }
 
@@ -46,18 +52,6 @@ async function toSHA256(message: string): Promise<string> {
 </script>
 
 <template>
-  <div class="flex justify-center">
-    <p class="text-white font-arial mt-5 text-2xl">Display Name:</p>
-  </div>
-  <div class="flex justify-center">
-    <input
-      v-model="display_name"
-      class="form-control me-2 input-rounded text-[#efd0d0] bg-custom max-w-[30vh]"
-      type="text"
-      placeholder="Display Name"
-    />
-  </div>
-
   <div class="flex justify-center">
     <p class="text-white font-arial mt-5 text-2xl">Username:</p>
   </div>
@@ -84,25 +78,25 @@ async function toSHA256(message: string): Promise<string> {
   </div>
 
   <div class="flex justify-center mt-5">
-    <input type="checkbox" id="checkbox" />
+    <input type="checkbox" v-model="rememberMe" />
     <div class="text-white font-arial ml-1">Remember me</div>
   </div>
 
   <div class="flex justify-center mt-5">
     <button
-      @click="handleSignup"
+      @click="handleLogin"
       class="text-white font-arial text-2xl font-semibold bg-[#362323] rounded-xl px-4 py-2"
     >
-      Sign up
+      Login
     </button>
   </div>
   
   <div class="flex justify-center mt-5">
     <RouterLink 
-      to="/login"
+      to="/signup"
       class="text-white font-arial text-xl font-semibold bg-[#362323] rounded-xl px-2 py-1 no-underline"
     >
-      Log in instead
+      Sign up instead
     </RouterLink>
   </div>
 </template>
