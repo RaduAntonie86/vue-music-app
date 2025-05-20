@@ -2,14 +2,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Options;
 
 public class AuthService : IAuthService
 {
     private readonly IDbService _dbService;
+    private readonly JwtSettings _jwtSettings;
 
-    public AuthService(IDbService dbService)
+
+    public AuthService(IDbService dbService, IOptions<JwtSettings> jwtOptions)
     {
         _dbService = dbService;
+        _jwtSettings = jwtOptions.Value;
     }
 
     public async Task<LoginResult> LoginAsync(string username, string password)
@@ -27,7 +31,7 @@ public class AuthService : IAuthService
     private string GenerateJwtToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("n3vGq4aUYtZPHR9mEkAo1MTvGdLsWqxbmVk7L8d0YNqKPzRFJBIWq95jkt9ZUfTv");
+        var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -35,7 +39,11 @@ public class AuthService : IAuthService
                 new Claim(ClaimTypes.Name, user.Username)
             ]),
             Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            Issuer = _jwtSettings.Issuer,
+            Audience = _jwtSettings.Audience,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);

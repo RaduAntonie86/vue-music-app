@@ -34,6 +34,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 SqlMapper.AddTypeHandler(new DateOnlyHandler());
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
