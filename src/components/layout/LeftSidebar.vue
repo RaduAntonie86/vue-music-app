@@ -37,7 +37,7 @@ import router from '@/router';
       <playlist-preview 
         :playlistName="playlist.name"
         :description="playlist.description" 
-        :imagePath="playlist.image_path ? playlist.image_path : playlistImage">
+        :imagePath="playlist.imagePath ? playlist.imagePath : playlistImage">
       </playlist-preview>
     </div>
 </PerfectScrollbar>

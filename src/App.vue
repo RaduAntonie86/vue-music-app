@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/features/auth/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import MusicPlayer from './components/layout/MusicPlayer.vue'
 
 const authStore = useAuthStore()

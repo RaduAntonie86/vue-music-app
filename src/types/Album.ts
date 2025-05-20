@@ -1,6 +1,3 @@
-interface Album{
-    id: number
-    name: string
-    imagePath: string
-    releaseDate: string
+interface Album extends SongList {
+  releaseDate: string
 }

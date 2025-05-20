@@ -1,6 +1,3 @@
-  interface Playlist {
-    id: number;
-    name: string;
-    image_path: string;
-    description: string;
-  }
+interface Playlist extends SongList {
+  description: string
+}
