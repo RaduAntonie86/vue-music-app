@@ -19,16 +19,6 @@ const fetchPlaylists = async () => {
 const playlist_name = ref('')
 const playlist_description = ref('')
 
-const getFirstAvailableId = (): number => {
-  const sortedIds = [...existingPlaylistIds.value].sort((a, b) => a - b)
-  let nextId = 1
-  for (const id of sortedIds) {
-    if (id !== nextId) break
-    nextId++
-  }
-  return nextId
-}
-
 onMounted(() => {
   fetchSongs()
   fetchPlaylists()
@@ -174,7 +164,7 @@ const createPlaylist = async () => {
             <div class="flex align-middle place-items-center mb-2 mt-2">
               <img
                 class="rounded-lg mr-2.5"
-                src="../../assets/images/album.jpeg"
+                :src="albums[index]?.imagePath && albums[index].imagePath.trim() !== '' ? albums[index].imagePath : '/assets/images/album.jpeg'" 
                 width="50"
                 height="50"
               />
