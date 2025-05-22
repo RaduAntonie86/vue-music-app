@@ -12,7 +12,7 @@
             Search
         </RouterLink>
         <RouterLink to="/create-playlist" class="text-white no-underline ml-1">
-            <i class="bi bi-search mr-2 text-[25px]"></i>
+            <i class="bi bi-plus-lg mr-2 text-[25px]"></i>
             Create Playlist
         </RouterLink>
     </div>

@@ -72,7 +72,7 @@ const chunkedAlbums = computed(() => chunkArray(albums.value, 6))
           <div class="flex flex-col items-center">
             <img
               class="rounded-3xl"
-              src="../assets/images/album.jpeg"
+              src="../../assets/images/album.jpeg"
               width="120"
               height="120"
               style="margin-bottom: 5px"

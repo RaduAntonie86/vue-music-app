@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import router from '@/router'
+import { useAuthStore } from '@/stores/authStore'
 import { usePlayerStore } from '@/stores/usePlayerStore'
 import axios from 'axios'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
 const route = useRoute()
 const playlistId = ref(route.params.id)
+const auth = useAuthStore()
 
 onMounted(() => {
   fetchPlaylist()
@@ -111,6 +114,31 @@ const fetchSongArtists = async (songId: number) => {
     console.error(`Error fetching artists for album ${songId}:`, error)
   }
 }
+
+const deletePlaylist = async () => {
+  if(isOwner.value)
+  {
+    try {
+      const confirmed = confirm('Are you sure you want to delete this playlist?')
+      if (!confirmed) return;
+
+      await axios.delete(`http://localhost:5091/Playlist/${playlistId.value}`)
+      alert('Playlist deleted successfully.')
+      router.push('/')
+    } catch (error) {
+      console.error('Error deleting playlist:', error)
+      alert('Failed to delete the playlist.')
+    }
+  }
+  else
+  {
+    alert('You are not allowed to do this.')
+  }
+}
+
+const isOwner = computed(() => {
+  return users.value.some((user) => user.id === auth.userId)
+})
 </script>
 
 <template>
@@ -147,7 +175,14 @@ const fetchSongArtists = async (songId: number) => {
           class="rounded-full ml-1 bg-[#753E3E] size-12 flex place-content-center place-items-center"
         >
           <i class="fas fa-play text-2xl"></i>
-        </div>
+        </div>      
+        <button
+        v-if="isOwner"
+        @click="deletePlaylist()"
+        class="font-arial text-xl font-semibold bg-white rounded-xl ml-8 px-4 py-2 hover:text-[#888888] text-[#882323] mb-4"
+      >
+        Delete Playlist
+      </button>
       </div>
     </div>
     <div class="grid grid-cols-7 p-2 mx-2 font-arial text-[#753E3E] font-bold">

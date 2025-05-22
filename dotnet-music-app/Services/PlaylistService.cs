@@ -100,10 +100,21 @@ public class PlaylistService : IPlaylistService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"DELETE FROM public.playlist 
-                WHERE id=@Id";
-            var parameters = new { id };
-            await _dbService.EditData(query, parameters);
+            var deleteSongsQuery = @"
+                DELETE FROM public.playlist_songs 
+                WHERE playlist_id = @Id";
+            await _dbService.EditData(deleteSongsQuery, new { Id = id });
+
+            var deleteUsersQuery = @"
+                DELETE FROM public.playlist_users
+                WHERE playlist_id = @Id";
+            await _dbService.EditData(deleteUsersQuery, new { Id = id });
+
+            var deletePlaylistQuery = @"
+                DELETE FROM public.playlist 
+                WHERE id = @Id";
+            await _dbService.EditData(deletePlaylistQuery, new { Id = id });
+
             await _dbService.CommitTransactionAsync();
             return true;
         }
