@@ -1,7 +1,7 @@
 public class AlbumDto : SongListDto
 {
     public DateOnly ReleaseDate { get; set; }
-    public List<int> GenreIds { get; set; }
+    public required List<int> GenreIds { get; set; }
     protected AlbumDto(
         int id,
         string name,

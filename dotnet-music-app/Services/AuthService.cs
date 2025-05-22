@@ -18,6 +18,10 @@ public class AuthService : IAuthService
 
     public async Task<LoginResult> LoginAsync(string username, string password)
     {
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            return new LoginResult { IsSuccess = false, ErrorMessage = "No credentials sent" };
+        }
         var user = await _dbService.GetAsync<User>("SELECT * FROM public.user where username=@Username", new { username });
         if (user == null || password != user.Password)
         {

@@ -1,10 +1,10 @@
 public class SongListDto
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public required int Id { get; set; }
+    public required string Name { get; set; }
     public string ImagePath { get; set; }
-    public List<int> SongIds { get; set; }
-    public int UserId { get; set; }
+    public required List<int> SongIds { get; set; }
+    public required int UserId { get; set; }
     public SongListDto() { }
     protected SongListDto(int id, string name, string imagePath, List<int> songIds, int userId)
     {

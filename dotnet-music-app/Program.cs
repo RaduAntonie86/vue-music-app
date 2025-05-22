@@ -3,7 +3,6 @@ using Dapper;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IDbService, MusicAppDbService>();
-builder.Services.AddScoped<IDbService, MusicAppDbService>();
 builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPlaylistService, PlaylistService>();
@@ -11,8 +10,9 @@ builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-builder.Services.AddControllers();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -34,8 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 SqlMapper.AddTypeHandler(new DateOnlyHandler());
+
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthorization();

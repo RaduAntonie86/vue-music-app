@@ -1,6 +1,9 @@
 public interface IDbService
 {
-    Task<T> GetAsync<T>(string command, object parms); 
-    Task<List<T>> GetAll<T>(string command, object parms = default! );
+    Task BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
     Task<int> EditData(string command, object parms);
+    Task<T> GetAsync<T>(string query, object parameters);
+    Task<List<T>> GetAll<T>(string query, object parameters);
 }
