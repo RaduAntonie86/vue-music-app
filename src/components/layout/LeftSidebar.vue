@@ -32,7 +32,7 @@ import router from '@/router';
 </style>
 
 <template>
-<PerfectScrollbar class="bg-[#362323] max-h-[71.5vh] rounded-md p-1 overflow-auto">
+<PerfectScrollbar class="bg-[#362323] max-h-[75vh] rounded-md p-1 overflow-auto">
     <div v-for="(playlist) in playlists" :key="playlist.id" @click="handlePlaylistClick(playlist.id)">
       <playlist-preview 
         :playlistName="playlist.name"

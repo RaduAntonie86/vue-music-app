@@ -73,6 +73,7 @@ x64/
 *.tmp
 *.log
 *.jpeg
+*.7z
 *.vspscc
 *.vssscc
 .builds
