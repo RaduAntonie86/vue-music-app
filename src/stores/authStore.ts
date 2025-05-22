@@ -2,7 +2,10 @@ import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || null
+    token: localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || null,
+    userId: localStorage.getItem('userId') || sessionStorage.getItem('userId')
+    ? parseInt(localStorage.getItem('userId') || sessionStorage.getItem('userId')!)
+    : null,
   }),
   getters: {
     isLoggedIn: (state) => !!state.token
@@ -20,6 +23,11 @@ export const useAuthStore = defineStore('auth', {
     clearToken() {
       this.token = null
       localStorage.removeItem('authToken')
+    },
+    setUserId(id: number, rememberMeValue: boolean) {
+      this.userId = id
+      const storage = rememberMeValue ? localStorage : sessionStorage
+      storage.setItem('userId', id.toString())
     }
   }
 })

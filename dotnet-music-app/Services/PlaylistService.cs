@@ -1,3 +1,5 @@
+using System.Reflection.Metadata.Ecma335;
+
 public class PlaylistService : IPlaylistService
 {
     private readonly IDbService _dbService;
@@ -6,17 +8,27 @@ public class PlaylistService : IPlaylistService
     {
         _dbService = dbService;
     }
-
     public async Task<bool> CreatePlaylist(Playlist playlist)
     {
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"INSERT INTO public.playlist (id, description, name, image_path) 
-                VALUES (@Id, @Description, @Name, @ImagePath)";
-            var parameters = playlist;
-            await _dbService.EditData(query, parameters);
+            var query = @"
+                INSERT INTO public.playlist (description, name, image_path) 
+                VALUES (@Description, @Name, @ImagePath)
+                RETURNING id";
+            var parameters = new
+            {
+                playlist.Description,
+                playlist.Name,
+                playlist.ImagePath
+            };
+            var newId = await _dbService.GetAsync<int>(query, parameters);
+
+            playlist.Id = newId;
+
             await AddSongsToPlaylist(playlist.SongIds, playlist.Id);
+            await AddUserToPlaylist(playlist.UserId, playlist.Id);
             await _dbService.CommitTransactionAsync();
             return true;
         }
@@ -26,7 +38,6 @@ public class PlaylistService : IPlaylistService
             throw;
         }
     }
-
     public async Task<List<PlaylistDto>> GetPlaylistList()
     {
         await _dbService.BeginTransactionAsync();
@@ -119,5 +130,19 @@ public class PlaylistService : IPlaylistService
 
             await _dbService.EditData(query, parameters);
         }
+    }
+    private async Task AddUserToPlaylist(int userId, int playlistId)
+    {
+        var query = @"
+            INSERT INTO public.playlist_users (playlist_id, user_id)
+            VALUES (@PlaylistId, @UserId)";
+
+        var parameters = new
+        {
+            PlaylistId = playlistId,
+            UserId = userId
+        };
+
+        await _dbService.EditData(query, parameters);
     }
 }

@@ -1,12 +1,10 @@
 public class AlbumService : IAlbumService
 {
     private readonly IDbService _dbService;
-
     public AlbumService(IDbService dbService)
     {
         _dbService = dbService;
     }
-
     public async Task<bool> CreateAlbum(Album album)
     {
         await _dbService.BeginTransactionAsync();
@@ -28,7 +26,6 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
-
     public async Task<AlbumDto> GetAlbum(int id)
     {
         await _dbService.BeginTransactionAsync();
@@ -48,7 +45,6 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
-
     public async Task<List<AlbumDto>> GetAlbumList()
     {
         await _dbService.BeginTransactionAsync();
@@ -66,13 +62,13 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
-
     public async Task<List<AlbumDto>> GetAlbumsFromPlaylist(int playlist_id)
     {
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT a.id, a.name, a.image_path AS imagePath FROM playlist_songs ps 
+            var query = @"SELECT a.id, a.name, a.image_path AS imagePath 
+                    FROM playlist_songs ps 
                     JOIN album_songs aso ON ps.song_id = aso.song_id 
                     JOIN album a ON aso.album_id = a.id 
                     WHERE ps.playlist_id = @PlaylistId;";
@@ -87,7 +83,26 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
-
+    public async Task<AlbumDto> GetAlbumFromSong(int song_id)
+    {
+        await _dbService.BeginTransactionAsync();
+        try
+        {
+            var query = @"SELECT a.id, a.name, a.image_path AS imagePath 
+                FROM album_songs aso
+                JOIN album a ON aso.album_id = a.id 
+                WHERE aso.song_id = @SongId;";
+            var parameters = new { SongId = song_id };
+            var album = await _dbService.GetAsync<Album>(query, parameters);
+            await _dbService.CommitTransactionAsync();
+            return album != null ? AlbumDto.CopyAlbumToDto(album) : null;
+        }
+        catch
+        {
+            await _dbService.RollbackTransactionAsync();
+            throw;
+        }
+    }
     public async Task<List<AlbumDto>> GetAlbumListByName(string name)
     {
         await _dbService.BeginTransactionAsync();
@@ -107,7 +122,6 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
-
     public async Task<AlbumDto> UpdateAlbum(Album album)
     {
         await _dbService.BeginTransactionAsync();
@@ -129,7 +143,6 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
-
     public async Task<bool> DeleteAlbum(int id)
     {
         await _dbService.BeginTransactionAsync();
@@ -162,7 +175,6 @@ public class AlbumService : IAlbumService
             await _dbService.EditData(query, parameters);
         }
     }
-
     private async Task AddToGenreList(List<int> genreIds, int albumId)
     {
         foreach (var genreId in genreIds)

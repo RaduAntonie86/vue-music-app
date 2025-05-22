@@ -29,7 +29,7 @@ public class AuthService : IAuthService
         }
 
         var token = GenerateJwtToken(user);
-        return new LoginResult { IsSuccess = true, Token = token };
+        return new LoginResult { IsSuccess = true, Token = token, Id = user.Id };
     }
 
     private string GenerateJwtToken(User user)

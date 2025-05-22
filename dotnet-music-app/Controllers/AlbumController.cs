@@ -32,6 +32,13 @@ public class AlbumController : Controller
         return Ok(result);
     }
 
+    [HttpGet("song_id/{song_id:int}")]
+    public async Task<IActionResult> GetAlbumFromSong(int song_id)
+    {
+        var result = await _albumService.GetAlbumFromSong(song_id);
+        return Ok(result);
+    }
+
     [HttpGet("{name}")]
     public async Task<IActionResult> GetAlbumListByName(string name)
     {

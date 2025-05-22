@@ -5,6 +5,7 @@ import SearchPage from '@/features/search/SearchPage.vue'
 import AlbumPage from '@/features/album/AlbumPage.vue'
 import LoginPage from '@/features/auth/LoginPage.vue'
 import SignupPage from '@/features/auth/SignupPage.vue'
+import CreatePlaylist from '@/features/playlist/CreatePlaylist.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,7 +41,12 @@ const router = createRouter({
       name: 'album',
       component: AlbumPage,
       props: true
-    }
+    },
+    {
+      path: '/create-playlist',
+      name: 'create-playlist',
+      component: CreatePlaylist
+    },
   ]
 })
 

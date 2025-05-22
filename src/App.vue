@@ -18,6 +18,7 @@ const handleLogout = () => {
   authStore.clearToken()
   router.push('/login')
 }
+
 </script>
 
 <template>

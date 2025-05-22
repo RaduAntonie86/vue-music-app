@@ -16,8 +16,8 @@ public class AuthController : ControllerBase
     {
         var result = await _authService.LoginAsync(request.Username, request.Password);
         if (!result.IsSuccess)
-            return Unauthorized(new { message = result.ErrorMessage });
+            return Unauthorized(result);
 
-        return Ok(new { token = result.Token });
+        return Ok(result);
     }
 }

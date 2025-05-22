@@ -19,7 +19,6 @@ public class MusicAppDbService : IDbService
         _transactionConnection = npgsqlConn;
         _transaction = npgsqlConn.BeginTransaction();
     }
-
     public Task CommitTransactionAsync()
     {
         _transaction?.Commit();
@@ -31,7 +30,6 @@ public class MusicAppDbService : IDbService
 
         return Task.CompletedTask;
     }
-
     public Task RollbackTransactionAsync()
     {
         _transaction?.Rollback();
@@ -43,25 +41,19 @@ public class MusicAppDbService : IDbService
 
         return Task.CompletedTask;
     }
-
     public async Task<T> GetAsync<T>(string command, object parms)
     {
         var conn = _transaction != null ? _transactionConnection : _db;
         return (await conn.QueryAsync<T>(command, parms, _transaction)).FirstOrDefault();
     }
-
     public async Task<List<T>> GetAll<T>(string command, object parms = default!)
     {
         var conn = _transaction != null ? _transactionConnection : _db;
         return (await conn.QueryAsync<T>(command, parms, _transaction)).ToList();
     }
-
     public async Task<int> EditData(string command, object parms)
     {
-        int result;
-
-        result = await _db.ExecuteAsync(command, parms);
-
-        return result;
+        var conn = _transaction != null ? _transactionConnection : _db;
+        return await conn.ExecuteAsync(command, parms, _transaction);
     }
 }

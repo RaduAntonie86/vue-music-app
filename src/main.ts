@@ -26,6 +26,7 @@ import App from './App.vue'
 import router from './router'
 import SearchMenu from './features/search/SearchMenu.vue'
 import PlaylistList from './features/playlist/PlaylistList.vue'
+import PlaylistCreation from './features/playlist/PlaylistCreation.vue'
 
 const app = createApp(App)
 app.use(createPinia())
@@ -43,6 +44,7 @@ app.component('album-preview', AlbumPreview)
 app.component('track-bar', TrackBar)
 app.component('playlist-preview', PlaylistPreview)
 app.component('icon-button', IconButton)
+app.component('playlist-creation', PlaylistCreation)
 
 createApp(App).use(PerfectScrollbarPlugin).mount('#app')
 createApp(App).use(router).mount('#app')

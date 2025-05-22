@@ -30,11 +30,11 @@ const handleLogin = async () => {
     if (!response.ok) throw new Error('Login failed')
 
     const data = await response.json()
-
     authStore.setToken(data.token, rememberMe.value)
+    authStore.setUserId(data.id, rememberMe.value)
 
     console.log('Log in success:', data)
-    router.push("/")
+    router.push('/')
   } catch (error) {
     console.error('Login error:', error)
   }
@@ -60,8 +60,7 @@ async function toSHA256(message: string): Promise<string> {
       v-model="username"
       class="form-control me-2 input-rounded text-[#efd0d0] bg-custom max-w-[30vh]"
       type="text"
-      placeholder="Username"
-    />
+      placeholder="Username"/>
   </div>
 
   <div class="flex justify-center mt-5">

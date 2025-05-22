@@ -33,6 +33,7 @@ const handleSignup = async () => {
     const data = await response.json()
 
     authStore.setToken(data.token, rememberMe.value)
+    authStore.setUserId(data.id, rememberMe.value)
 
     console.log('Sign up success:', data)
     router.push("/");
