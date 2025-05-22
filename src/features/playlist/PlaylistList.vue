@@ -23,10 +23,11 @@ const store = usePlayerStore()
 const playSong = (song: Song) => {
   const index = songs.value.findIndex((s) => s.id === song.id)
   if (index !== -1) {
-    store.setPlaylist(
-      songs.value,
-      songs.value.map(song => songArtists.value[song.id] || [])
-    )
+      store.setPlaylist(
+        songs.value,
+        songs.value.map((song) => songArtists.value[song.id] || []),
+        songs.value.map(song => songToAlbumMap.value.get(song.id)!)
+      )
     store.playSongByIndex(index)
   }
 }
@@ -46,9 +47,7 @@ const playlist = ref<Playlist>()
 
 const fetchPlaylist = async () => {
   try {
-    const response = await axios.get<Playlist>(
-      `http://localhost:5091/Playlist/${playlistId.value}`
-    )
+    const response = await axios.get<Playlist>(`http://localhost:5091/Playlist/${playlistId.value}`)
     playlist.value = response.data
   } catch (error) {
     console.error('Error fetching playlist:', error)
@@ -116,11 +115,10 @@ const fetchSongArtists = async (songId: number) => {
 }
 
 const deletePlaylist = async () => {
-  if(isOwner.value)
-  {
+  if (isOwner.value) {
     try {
       const confirmed = confirm('Are you sure you want to delete this playlist?')
-      if (!confirmed) return;
+      if (!confirmed) return
 
       await axios.delete(`http://localhost:5091/Playlist/${playlistId.value}`)
       alert('Playlist deleted successfully.')
@@ -129,9 +127,7 @@ const deletePlaylist = async () => {
       console.error('Error deleting playlist:', error)
       alert('Failed to delete the playlist.')
     }
-  }
-  else
-  {
+  } else {
     alert('You are not allowed to do this.')
   }
 }
@@ -139,12 +135,29 @@ const deletePlaylist = async () => {
 const isOwner = computed(() => {
   return users.value.some((user) => user.id === auth.userId)
 })
+
+const songToAlbumMap = computed(() => {
+  const map = new Map<number, Album>()
+
+  // Assumes song order and album order match, which is fragile
+  songs.value.forEach((song, index) => {
+    const album = albums.value[index]
+    if (album) {
+      map.set(song.id, album)
+    }
+  })
+
+  return map
+})
 </script>
 
 <template>
   <div class="bg-[#362323] rounded-md">
     <div class="flex align-middle place-items-center p-4">
-      <img class="rounded-3xl mr-4" src="../../assets/images/album.jpeg" width="250" height="250" />
+      <img class="rounded-3xl mr-4" 
+      :src="playlist?.imagePath && playlist.imagePath.trim() !== '' ? playlist.imagePath : '/assets/images/album.jpeg'"  
+      width="250" 
+      height="250" />
       <div class="mt-[50px]">
         <div class="text-white text-lg font-arial mb-1">Playlist</div>
         <div class="text-white text-6xl font-semibold font-arial mb-1">
@@ -155,7 +168,22 @@ const isOwner = computed(() => {
         </div>
         <div class="text-white text-lg font-arial">Made by:</div>
         <div class="flex align-middle place-items-center mb-2 mt-2">
-          <img class="rounded-full mr-2.5" src="../../assets/images/user.jpg" width="30" height="30" />
+          <img
+            class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
+            :src="
+              users.length > 0 && users[0].imagePath?.trim() !== ''
+                ? users[0].imagePath
+                : '/images/user.jpg'
+            "
+            @error="
+              (e) => {
+                const img = e.target as HTMLImageElement
+                if (!img.src.endsWith('/user.jpg')) {
+                  img.src = '/images/user.jpg'
+                }
+              }
+            "
+          />
           <div class="flex items-center text-white text-md font-arial">
             <div v-if="users.length > 0" class="flex flex-wrap gap-x-1">
               <div class="hover:text-[#888888]" v-for="(user, index) in users" :key="index">
@@ -175,14 +203,14 @@ const isOwner = computed(() => {
           class="rounded-full ml-1 bg-[#753E3E] size-12 flex place-content-center place-items-center"
         >
           <i class="fas fa-play text-2xl"></i>
-        </div>      
+        </div>
         <button
-        v-if="isOwner"
-        @click="deletePlaylist()"
-        class="font-arial text-xl font-semibold bg-white rounded-xl ml-8 px-4 py-2 hover:text-[#888888] text-[#882323] mb-4"
-      >
-        Delete Playlist
-      </button>
+          v-if="isOwner"
+          @click="deletePlaylist()"
+          class="font-arial text-xl font-semibold bg-white rounded-xl ml-8 px-4 py-2 hover:text-[#888888] text-[#882323] mb-4"
+        >
+          Delete Playlist
+        </button>
       </div>
     </div>
     <div class="grid grid-cols-7 p-2 mx-2 font-arial text-[#753E3E] font-bold">
@@ -207,7 +235,7 @@ const isOwner = computed(() => {
             <div class="flex align-middle place-items-center mb-2 mt-2">
               <img
                 class="rounded-lg mr-2.5"
-                src="../../assets/images/album.jpeg"
+                :src="albums[index]?.imagePath && albums[index].imagePath.trim() !== '' ? albums[index].imagePath : '/assets/images/album.jpeg'" 
                 width="50"
                 height="50"
               />

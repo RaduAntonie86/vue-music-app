@@ -20,7 +20,8 @@ const playSong = (song: Song) => {
   if (index !== -1) {
     store.setPlaylist(
       songs.value,
-      songs.value.map(song => songArtists.value[song.id] || [])
+      songs.value.map(song => songArtists.value[song.id] || []),
+      Array(songs.value.length).fill(album.value!)
     )
     store.playSongByIndex(index)
   }
@@ -99,19 +100,22 @@ const albumArtists = computed(() => {
 <template>
   <div class="bg-[#362323] rounded-md overflow-hidden">
     <div class="flex align-middle place-items-center p-4">
-      <img class="rounded-3xl mr-4" src="../../assets/images/album.jpeg" width="250" height="250" />
+      <img class="rounded-3xl mr-4" 
+          :src="album?.imagePath && album.imagePath.trim() !== '' ? album.imagePath : '/assets/images/album.jpeg'" 
+          width="250" 
+          height="250" />
       <div class="mt-[50px]">
         <div class="text-white text-lg font-arial mb-1">Album</div>
         <div class="text-white text-6xl font-semibold font-arial mb-1">
           {{ album?.name || 'Loading...' }}
         </div>
         <div class="flex align-middle place-items-center mb-2 mt-2">
-          <img
-            class="rounded-full mr-2.5"
-            src='../../assets/images/user.jpg'
-            width="30"
-            height="30"
-          />
+        <img
+          class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
+          :src="albumArtists.length > 0 && albumArtists[0].imagePath?.trim() !== '' 
+                  ? albumArtists[0].imagePath 
+                  : '/assets/images/user.jpg'"
+        />
           <div>
             <div v-if="albumArtists.length > 0" class="flex flex-wrap gap-x-1">
               <button v-for="(user) in albumArtists" :key="user.id" class="hover:text-[#888888]">

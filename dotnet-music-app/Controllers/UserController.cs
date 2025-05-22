@@ -34,12 +34,17 @@ public class UserController : Controller
 
         return Ok(result);
     }
-
-
     [HttpGet("song_id/{song_id:int}")]
     public async Task<IActionResult> GetUsersFromSong(int song_id)
     {
         var result = await _userService.GetUsersFromSong(song_id);
+
+        return Ok(result);
+    }
+    [HttpGet("album_id/{album_id:int}")]
+    public async Task<IActionResult> GetUsersFromAlbum(int album_id)
+    {
+        var result = await _userService.GetUsersFromAlbum(album_id);
 
         return Ok(result);
     }

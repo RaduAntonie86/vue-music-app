@@ -48,7 +48,7 @@ public class UserService : IUserService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT us.id, us.display_name AS ""DisplayName""
+            var query = @"SELECT us.id, us.display_name AS ""DisplayName"", us.image_path AS ""ImagePath""
                     FROM public.""user"" us
                     JOIN playlist_users pu ON pu.user_id = us.id
                     WHERE pu.playlist_id = @PlaylistId";
@@ -69,11 +69,34 @@ public class UserService : IUserService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT us.id, us.display_name AS ""DisplayName"" 
+            var query = @"SELECT us.id, us.display_name AS ""DisplayName"", us.image_path AS ImagePath 
                 FROM public.""user"" us 
                 JOIN song_artists sa ON sa.artist_id = us.id 
                 WHERE sa.song_id = @SongID";
             var parameters = new { SongId = song_id };
+            var UserList = await _dbService.GetAll<User>(query, parameters);
+            await _dbService.CommitTransactionAsync();
+            return UserList.Select(UserDto.CopyUserToDto).ToList();
+        }
+        catch
+        {
+            await _dbService.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
+    public async Task<List<UserDto>> GetUsersFromAlbum(int album_id)
+    {
+        await _dbService.BeginTransactionAsync();
+        try
+        {
+            var query = @"SELECT DISTINCT u.id, u.display_name AS DisplayName
+                    FROM public.user u
+                    JOIN song_artists sa ON u.id = sa.artist_id
+                    JOIN song s ON sa.song_id = s.id
+                    JOIN album_songs als ON s.id = als.song_id
+                    WHERE als.album_id = @AlbumId;";
+            var parameters = new { AlbumId = album_id };
             var UserList = await _dbService.GetAll<User>(query, parameters);
             await _dbService.CommitTransactionAsync();
             return UserList.Select(UserDto.CopyUserToDto).ToList();

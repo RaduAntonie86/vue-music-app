@@ -60,7 +60,8 @@ public class PlaylistService : IPlaylistService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT * FROM public.playlist 
+            var query = @"SELECT id, description, name, image_path AS ""ImagePath""
+                    FROM public.playlist 
                     WHERE id=@Id";
             var parameters = new { id };
             var playlist = await _dbService.GetAsync<Playlist>(query, parameters);

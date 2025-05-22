@@ -16,14 +16,18 @@ watch(search, (newVal) => {
 
 const albums = ref<Album[]>([])
 
+const albumArtists = ref<Record<number, User[]>>({})
+
 const searchAlbums = async () => {
   try {
-    const response = await axios.get<Album[]>(
-      `http://localhost:5091/Album/${currentSearch.value}`
-    )
+    const response = await axios.get<Album[]>(`http://localhost:5091/Album/${currentSearch.value}`)
     albums.value = response.data
+
+    for (const album of response.data) {
+      await fetchAlbumArtists(album.id)
+    }
   } catch (error) {
-    console.error('Error fetching songs from playlist:', error)
+    console.error('Error fetching albums:', error)
   }
 }
 
@@ -44,6 +48,15 @@ onMounted(() => {
 })
 
 const chunkedAlbums = computed(() => chunkArray(albums.value, 6))
+
+const fetchAlbumArtists = async (albumId: number) => {
+  try {
+    const response = await axios.get<User[]>(`http://localhost:5091/User/album_id/${albumId}`)
+    albumArtists.value[albumId] = response.data
+  } catch (error) {
+    console.error(`Error fetching artists for album ${albumId}:`, error)
+  }
+}
 </script>
 
 <template>
@@ -71,14 +84,24 @@ const chunkedAlbums = computed(() => chunkArray(albums.value, 6))
         >
           <div class="flex flex-col items-center">
             <img
+              :src="
+                album.imagePath && album.imagePath.trim() !== ''
+                  ? album.imagePath
+                  : '/assets/images/album.jpeg'
+              "
               class="rounded-3xl"
-              src="../../assets/images/album.jpeg"
               width="120"
               height="120"
-              style="margin-bottom: 5px"
             />
             <div class="text-white text-lg font-arial">{{ album.name }}</div>
-            <div class="text-white text-sm font-arial">Artist Name</div>
+            <div class="text-white text-sm font-arial">
+              <span v-if="albumArtists[album.id]">
+                <span v-for="(artist, i) in albumArtists[album.id]" :key="artist.id">
+                  {{ artist.displayName }}<span v-if="i < albumArtists[album.id].length - 1">, </span>
+                </span>
+              </span>
+              <span v-else>Unknown Artist</span>
+            </div>
           </div>
         </button>
       </div>

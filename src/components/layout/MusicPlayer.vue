@@ -15,18 +15,25 @@ const { playing, volume } = useMediaControls(audio)
 
 const currentSong = computed(() => store.currentSong)
 
-watch(() => store.playlist, (val) => {
-  console.log('Playlist changed', val.map((s) => s.name))
-})
+watch(
+  () => store.playlist,
+  (val) => {
+    console.log(
+      'Playlist changed',
+      val.map((s) => s.name)
+    )
+  }
+)
 
 watch(currentSong, (newSong) => {
   if (newSong && audio.value) {
     const tryPlay = () => {
-      audio.value?.play()
+      audio.value
+        ?.play()
         .then(() => {
           playing.value = true
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('Autoplay failed:', err)
         })
 
@@ -34,7 +41,7 @@ watch(currentSong, (newSong) => {
     }
 
     audio.value.addEventListener('canplay', tryPlay, { once: true })
-    
+
     audio.value.load()
   }
 })
@@ -97,28 +104,22 @@ function handleAudioError() {
 const nextSong = () => {
   if (store.currentIndex < store.playlist.length - 1) {
     store.playSongByIndex(store.currentIndex + 1)
-  }
-  else if(repeat.value)
-    store.playSongByIndex(0)
+  } else if (repeat.value) store.playSongByIndex(0)
 }
 
-const selectNextSong = () =>{
+const selectNextSong = () => {
   if (store.currentIndex < store.playlist.length - 1) {
     store.playSongByIndex(store.currentIndex + 1)
-  }
-  else
-    store.playSongByIndex(0)
+  } else store.playSongByIndex(0)
 }
 
 const selectPreviousSong = () => {
   if (audio.value) {
     if (audio.value.currentTime > 1) {
       audio.value.currentTime = 0
-    } 
-    else if (store.currentIndex > 0) {
+    } else if (store.currentIndex > 0) {
       store.playSongByIndex(store.currentIndex - 1)
-    }
-    else {
+    } else {
       store.playSongByIndex(store.playlist.length - 1)
     }
   }
@@ -154,7 +155,7 @@ function toggleMute() {
 }
 
 function setVolume(newPercent: number) {
-  volume.value = newPercent / 100;
+  volume.value = newPercent / 100
 }
 </script>
 
@@ -164,7 +165,13 @@ function setVolume(newPercent: number) {
       <div class="flex align-middle items-center">
         <img
           class="rounded-3xl mr-[10px]"
-          src="../../assets/images/album.jpeg"
+          :src="
+            store.currentAlbum &&
+            store.currentAlbum.imagePath &&
+            store.currentAlbum.imagePath.trim() !== ''
+              ? store.currentAlbum.imagePath
+              : '/assets/images/album.jpeg'
+          "
           width="70"
           height="70"
         />
@@ -172,17 +179,21 @@ function setVolume(newPercent: number) {
           <div class="text-white text-lg font-arial">
             {{ store.currentSong?.name || 'No song playing' }}
           </div>
-            <div class="text-white text-xs font-arial">
-              {{ store.currentArtists.map(artist => artist.displayName).join(', ') || 'Unknown Artist' }}
-            </div>
+          <div class="text-white text-xs font-arial">
+            {{
+              store.currentArtists.map((artist) => artist.displayName).join(', ') ||
+              'Unknown Artist'
+            }}
+          </div>
         </div>
       </div>
 
       <icon-button
         iconName="bi-shuffle"
         @click="toggleShuffle"
-        :class="['hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
-        shuffle ? 'text-[#888888]' : 'text-white'
+        :class="[
+          'hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
+          shuffle ? 'text-[#888888]' : 'text-white'
         ]"
       ></icon-button>
 
@@ -218,22 +229,19 @@ function setVolume(newPercent: number) {
       <icon-button
         iconName="bi-repeat"
         @click="toggleRepeat"
-        :class="['hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
-        repeat ? 'text-[#888888]' : 'text-white'
+        :class="[
+          'hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
+          repeat ? 'text-[#888888]' : 'text-white'
         ]"
       ></icon-button>
 
       <div class="flex items-center">
-        <icon-button 
-            :iconName="muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
-            @click="toggleMute"
-            class="mr-2 text-white text-2xl hover:text-3xl"></icon-button>
-        <track-bar
-          width="220"
-          height="11"
-          :percent="volume * 100"
-          @input="setVolume"
-        />
+        <icon-button
+          :iconName="muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
+          @click="toggleMute"
+          class="mr-2 text-white text-2xl hover:text-3xl"
+        ></icon-button>
+        <track-bar width="220" height="11" :percent="volume * 100" @input="setVolume" />
       </div>
     </div>
   </div>
