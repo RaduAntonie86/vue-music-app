@@ -33,7 +33,7 @@ watch(
       fetchPlaylists()
     }
   },
-  { immediate: true } // triggers the watcher right away on mount
+  { immediate: true }
 )
 </script>
 
