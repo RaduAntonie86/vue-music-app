@@ -22,12 +22,14 @@ const fetchAlbum = async () => {
 
     if (album.value?.songIds?.length) {
       // Fetch songs by their IDs
-      const songRequests = album.value.songIds.map((id) => axios.get<Song>(`http://localhost:5091/Song/${id}`))
+      const songRequests = album.value.songIds.map((id) =>
+        axios.get<Song>(`http://localhost:5091/Song/${id}`)
+      )
       const songResponses = await Promise.all(songRequests)
-      songs.value = songResponses.map(res => res.data)
+      songs.value = songResponses.map((res) => res.data)
 
       // Fetch artists for each song
-      await Promise.all(songs.value.map(song => fetchSongArtists(song.id)))
+      await Promise.all(songs.value.map((song) => fetchSongArtists(song.id)))
     } else {
       songs.value = []
     }
@@ -73,17 +75,20 @@ const playSong = (song: Song) => {
   if (index !== -1) {
     store.setPlaylist(
       songs.value,
-      songs.value.map(s => songArtists.value[s.id] || []),
+      songs.value.map((s) => songArtists.value[s.id] || []),
       Array(songs.value.length).fill(album.value!)
     )
     store.playSongByIndex(index)
   }
 }
 
-watch(() => route.params.id, (newId) => {
-  albumId.value = newId
-  fetchAlbum()
-})
+watch(
+  () => route.params.id,
+  (newId) => {
+    albumId.value = newId
+    fetchAlbum()
+  }
+)
 
 onMounted(() => {
   fetchAlbum()
@@ -96,7 +101,9 @@ const selectedSong = ref<Song | null>(null)
 const fetchPlaylists = async () => {
   if (authStore.isLoggedIn) {
     try {
-      const response = await axios.get<Playlist[]>(`http://localhost:5091/Playlist/user/${authStore.userId}`)
+      const response = await axios.get<Playlist[]>(
+        `http://localhost:5091/Playlist/user/${authStore.userId}`
+      )
       playlists.value = response.data
     } catch (error) {
       console.error('Error fetching playlists:', error)
@@ -121,7 +128,9 @@ const closePlaylistModal = () => {
 const addSongToPlaylist = async (playlistId: number) => {
   if (!selectedSong.value) return
   try {
-    await axios.post(`http://localhost:5091/Playlist/${playlistId}/addSong/${selectedSong.value.id}`)
+    await axios.post(
+      `http://localhost:5091/Playlist/${playlistId}/addSong/${selectedSong.value.id}`
+    )
     console.log(`Added song ${selectedSong.value.id} to playlist ${playlistId}`)
     closePlaylistModal()
   } catch (error) {
@@ -147,16 +156,17 @@ const addSongToPlaylist = async (playlistId: number) => {
         <div class="flex align-middle place-items-center mb-2 mt-2">
           <img
             class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
-            :src="albumArtists.length && albumArtists[0].imagePath?.trim() ? albumArtists[0].imagePath : '/assets/images/user.jpg'"
+            :src="
+              albumArtists.length && albumArtists[0].imagePath?.trim()
+                ? albumArtists[0].imagePath
+                : '/assets/images/user.jpg'
+            "
           />
           <div>
             <div v-if="albumArtists.length > 0" class="flex flex-wrap gap-x-1">
-              <button
-                v-for="user in albumArtists"
-                :key="user.id"
-                class="hover:text-[#888888]"
-              >
-                {{ user.displayName }}<span v-if="user !== albumArtists[albumArtists.length - 1]">, </span>
+              <button v-for="user in albumArtists" :key="user.id" class="hover:text-[#888888]">
+                {{ user.displayName
+                }}<span v-if="user !== albumArtists[albumArtists.length - 1]">, </span>
               </button>
             </div>
             <div v-else>Unknown Artist</div>
