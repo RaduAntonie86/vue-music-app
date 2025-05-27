@@ -1,16 +1,15 @@
 public class Album : SongList
 {
     public DateOnly ReleaseDate { get; set; }
-    public required List<int> GenreIds { get; set; }
+    public required List<long> GenreIds { get; set; }
     public Album(): base() { }
     public Album(
         int id,
         string name,
         string imagePath,
-        List<int> songIds,
-        int userId,
+        List<long> songIds,
         DateOnly releaseDate,
-        List<int> genreIds) : base(id, name, imagePath, songIds, userId)
+        List<long> genreIds) : base(id, name, imagePath, songIds)
     {
         ReleaseDate = releaseDate;
         GenreIds = genreIds;

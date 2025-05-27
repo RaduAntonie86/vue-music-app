@@ -10,7 +10,9 @@ const existingPlaylistIds = ref<number[]>([])
 const fetchPlaylists = async () => {
   try {
     const response = await axios.get<Playlist[]>(`http://localhost:5091/Playlist`)
-    existingPlaylistIds.value = response.data.map(p => p.id)
+    existingPlaylistIds.value = response.data
+      .map(p => p.id)
+      .filter((id): id is number => id !== undefined);
   } catch (error) {
     console.error('Error fetching playlists:', error)
   }
@@ -93,27 +95,29 @@ const createPlaylist = async () => {
     router.push('/')
     return
   }
-  if (songsForPlaylist.value.length == 0)
-  {
+
+  if (songsForPlaylist.value.length === 0) {
     alert('Please select any songs to be added to the playlist.')
     return
   }
-  try {
-    const payload = {
-    name: playlist_name.value,
-    description: playlist_description.value,
-    imagePath: '',
-    userId: auth.userId,
-    songIds: songsForPlaylist.value.map(song => song.id)
-    }
-    const response = await axios.post('http://localhost:5091/Playlist/add', payload)
 
-    console.log('Playlist created successfully:', response.data)
-    router.push('/')
+  try {
+    const payload: Playlist = {
+      name: playlist_name.value,
+      description: playlist_description.value,
+      imagePath: '',
+      userIds: [auth.userId], // ✅ now an array
+      songIds: songsForPlaylist.value.map(song => song.id)
+    };
+
+    const response = await axios.post('http://localhost:5091/Playlist/add', payload);
+
+    console.log('Playlist created successfully:', response.data);
+    router.push('/');
   } catch (error) {
-    console.error('Error creating playlist:', error)
+    console.error('Error creating playlist:', error);
   }
-}
+};
 </script>
 
 <template>
@@ -162,12 +166,12 @@ const createPlaylist = async () => {
         <div class="grid grid-cols-6 p-2 mx-2 font-arial font-bold">
           <div class="col-span-2">
             <div class="flex align-middle place-items-center mb-2 mt-2">
-              <img
-                class="rounded-lg mr-2.5"
-                :src="albums[index]?.imagePath && albums[index].imagePath.trim() !== '' ? albums[index].imagePath : 'images/albums/album.jpeg'" 
-                width="50"
-                height="50"
-              />
+            <img
+              class="rounded-lg mr-2.5"
+              :src="albums[song.id]?.imagePath && albums[song.id].imagePath.trim() !== '' ? albums[song.id].imagePath : 'images/albums/album.jpeg'"
+              width="50"
+              height="50"
+            />
               <div>
                 <div class="text-lg font-arial">{{ song.name }}</div>
                 <div class="text-xs font-arial font-normal">

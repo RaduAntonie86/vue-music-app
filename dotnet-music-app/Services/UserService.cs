@@ -113,7 +113,8 @@ public class UserService : IUserService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT * FROM public.user 
+            var query = @"SELECT id, display_name AS ""DisplayName"", username, image_path AS ""ImagePath"", description
+                FROM public.user 
                 WHERE id=@Id";
             var parameters = new { id };
             var user = await _dbService.GetAsync<User>(query, parameters);

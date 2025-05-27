@@ -1,15 +1,14 @@
 public class AlbumDto : SongListDto
 {
     public DateOnly ReleaseDate { get; set; }
-    public required List<int> GenreIds { get; set; }
+    public required List<long> GenreIds { get; set; }
     protected AlbumDto(
         int id,
         string name,
         string imagePath,
-        List<int> songIds,
-        int userId,
+        List<long> songIds,
         DateOnly releaseDate,
-        List<int> genreIds) : base(id, name, imagePath, songIds, userId)
+        List<long> genreIds) : base(id, name, imagePath, songIds)
     {
         ReleaseDate = releaseDate;
         GenreIds = genreIds;
@@ -23,7 +22,6 @@ public class AlbumDto : SongListDto
             Name = album.Name,
             ImagePath = album.ImagePath,
             SongIds = album.SongIds,
-            UserId = album.UserId,
             ReleaseDate = album.ReleaseDate,
             GenreIds = album.GenreIds
         };

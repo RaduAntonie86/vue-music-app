@@ -35,6 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 SqlMapper.AddTypeHandler(new DateOnlyHandler());
+SqlMapper.AddTypeHandler(new ListLongHandler());
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");

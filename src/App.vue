@@ -15,7 +15,7 @@ const showPlayer = computed(() => {
 })
 
 const handleLogout = () => {
-  authStore.clearToken()
+  authStore.clearAll()
   router.push('/login')
 }
 

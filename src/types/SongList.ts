@@ -1,5 +1,6 @@
 interface SongList {
-  id: number
+  id?: number
   name: string
   imagePath: string
+  songIds: number[]
 }

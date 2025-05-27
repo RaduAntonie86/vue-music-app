@@ -9,43 +9,92 @@ import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 const route = useRoute()
 const albumId = ref(route.params.id)
 const authStore = useAuthStore()
+const store = usePlayerStore()
 
-onMounted(() => {
-  fetchAlbum()
-  fetchAlbumSongs()
-  fetchPlaylists()
+const album = ref<Album | null>(null)
+const songs = ref<Song[]>([])
+const songArtists = ref<Record<number, User[]>>({})
+
+const fetchAlbum = async () => {
+  try {
+    const response = await axios.get<Album>(`http://localhost:5091/Album/${albumId.value}`)
+    album.value = response.data
+
+    if (album.value?.songIds?.length) {
+      // Fetch songs by their IDs
+      const songRequests = album.value.songIds.map((id) => axios.get<Song>(`http://localhost:5091/Song/${id}`))
+      const songResponses = await Promise.all(songRequests)
+      songs.value = songResponses.map(res => res.data)
+
+      // Fetch artists for each song
+      await Promise.all(songs.value.map(song => fetchSongArtists(song.id)))
+    } else {
+      songs.value = []
+    }
+  } catch (error) {
+    console.error('Error fetching album or songs:', error)
+  }
+}
+
+const fetchSongArtists = async (songId: number) => {
+  try {
+    const response = await axios.get<User[]>(`http://localhost:5091/User/song_id/${songId}`)
+    songArtists.value[songId] = response.data
+  } catch (error) {
+    console.error(`Error fetching artists for song ${songId}:`, error)
+    songArtists.value[songId] = []
+  }
+}
+
+const albumArtists = computed(() => {
+  const seen = new Set<number>()
+  const allArtists: User[] = []
+
+  for (const artists of Object.values(songArtists.value)) {
+    for (const artist of artists) {
+      if (!seen.has(artist.id)) {
+        seen.add(artist.id)
+        allArtists.push(artist)
+      }
+    }
+  }
+
+  return allArtists
 })
 
-const store = usePlayerStore()
+const formatLength = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
 
 const playSong = (song: Song) => {
   const index = songs.value.findIndex((s) => s.id === song.id)
   if (index !== -1) {
     store.setPlaylist(
       songs.value,
-      songs.value.map((song) => songArtists.value[song.id] || []),
+      songs.value.map(s => songArtists.value[s.id] || []),
       Array(songs.value.length).fill(album.value!)
     )
     store.playSongByIndex(index)
   }
 }
 
-watch(
-  () => route.params.id,
-  (newId) => {
-    albumId.value = newId
-    fetchAlbum()
-    fetchAlbumSongs()
-  }
-)
+watch(() => route.params.id, (newId) => {
+  albumId.value = newId
+  fetchAlbum()
+})
+
+onMounted(() => {
+  fetchAlbum()
+})
 
 const playlists = ref<Playlist[]>([])
 const showPlaylistModal = ref(false)
 const selectedSong = ref<Song | null>(null)
 
 const fetchPlaylists = async () => {
-  if (authStore.isLoggedIn)
-  {
+  if (authStore.isLoggedIn) {
     try {
       const response = await axios.get<Playlist[]>(`http://localhost:5091/Playlist/user/${authStore.userId}`)
       playlists.value = response.data
@@ -54,6 +103,10 @@ const fetchPlaylists = async () => {
     }
   }
 }
+
+onMounted(() => {
+  fetchPlaylists()
+})
 
 const openPlaylistModal = (song: Song) => {
   selectedSong.value = song
@@ -68,74 +121,13 @@ const closePlaylistModal = () => {
 const addSongToPlaylist = async (playlistId: number) => {
   if (!selectedSong.value) return
   try {
-    await axios.post(
-      `http://localhost:5091/Playlist/${playlistId}/addSong/${selectedSong.value.id}`
-    )
+    await axios.post(`http://localhost:5091/Playlist/${playlistId}/addSong/${selectedSong.value.id}`)
     console.log(`Added song ${selectedSong.value.id} to playlist ${playlistId}`)
     closePlaylistModal()
   } catch (error) {
     console.error('Error adding song to playlist:', error)
   }
 }
-
-const formatLength = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-}
-
-const songs = ref<Song[]>([])
-
-const fetchAlbumSongs = async () => {
-  try {
-    const response = await axios.get<Song[]>(`http://localhost:5091/Song/album_id/${albumId.value}`)
-    songs.value = response.data
-
-    for (const song of response.data) {
-      await fetchSongArtists(song.id)
-    }
-  } catch (error) {
-    console.error('Error fetching songs from album:', error)
-  }
-}
-
-const album = ref<Album>()
-
-const fetchAlbum = async () => {
-  try {
-    const response = await axios.get<Album>(`http://localhost:5091/Album/${albumId.value}`)
-    album.value = response.data
-  } catch (error) {
-    console.error('Error fetching songs from playlist:', error)
-  }
-}
-
-const songArtists = ref<Record<number, User[]>>({})
-
-const fetchSongArtists = async (songId: number) => {
-  try {
-    const response = await axios.get<User[]>(`http://localhost:5091/User/song_id/${songId}`)
-    songArtists.value[songId] = response.data
-  } catch (error) {
-    console.error(`Error fetching artists for album ${songId}:`, error)
-  }
-}
-
-const albumArtists = computed(() => {
-  const seen = new Set<number>()
-  const allArtists: User[] = []
-
-  for (const artistList of Object.values(songArtists.value)) {
-    for (const artist of artistList) {
-      if (!seen.has(artist.id)) {
-        seen.add(artist.id)
-        allArtists.push(artist)
-      }
-    }
-  }
-
-  return allArtists
-})
 </script>
 
 <template>
@@ -143,11 +135,7 @@ const albumArtists = computed(() => {
     <div class="flex align-middle place-items-center p-4">
       <img
         class="rounded-3xl mr-4"
-        :src="
-          album?.imagePath && album.imagePath.trim() !== ''
-            ? album.imagePath
-            : '/images/albums/album.jpeg'
-        "
+        :src="album?.imagePath?.trim() ? album.imagePath : '/images/albums/album.jpeg'"
         width="250"
         height="250"
       />
@@ -159,28 +147,27 @@ const albumArtists = computed(() => {
         <div class="flex align-middle place-items-center mb-2 mt-2">
           <img
             class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
-            :src="
-              albumArtists.length > 0 && albumArtists[0].imagePath?.trim() !== ''
-                ? albumArtists[0].imagePath
-                : '/assets/images/user.jpg'
-            "
+            :src="albumArtists.length && albumArtists[0].imagePath?.trim() ? albumArtists[0].imagePath : '/assets/images/user.jpg'"
           />
           <div>
             <div v-if="albumArtists.length > 0" class="flex flex-wrap gap-x-1">
-              <button v-for="user in albumArtists" :key="user.id" class="hover:text-[#888888]">
-                {{ user.displayName }}<span>,</span>
+              <button
+                v-for="user in albumArtists"
+                :key="user.id"
+                class="hover:text-[#888888]"
+              >
+                {{ user.displayName }}<span v-if="user !== albumArtists[albumArtists.length - 1]">, </span>
               </button>
             </div>
             <div v-else>Unknown Artist</div>
           </div>
-          <div>
-            <div class="text-white text-md font-arial ml-2">
-              {{ album?.releaseDate || 'Unknown' }}
-            </div>
+          <div class="text-white text-md font-arial ml-2">
+            {{ album?.releaseDate || 'Unknown' }}
           </div>
         </div>
       </div>
     </div>
+
     <div class="mx-2">
       <div class="flex justify-between items-center">
         <div
@@ -190,6 +177,7 @@ const albumArtists = computed(() => {
         </div>
       </div>
     </div>
+
     <div class="grid grid-cols-9 gap-4 p-2 mx-2 font-arial text-[#753E3E] font-bold">
       <div>#</div>
       <div class="col-span-2">Title</div>
@@ -197,9 +185,11 @@ const albumArtists = computed(() => {
       <div class="col-span-2">Length</div>
       <div class="col-span-2"></div>
     </div>
+
     <div class="mx-2">
       <mat-divider></mat-divider>
     </div>
+
     <PerfectScrollbar class="overflow-hidden min-h-[43vh] max-h-[43vh]">
       <div
         v-for="(song, index) in songs"
@@ -214,10 +204,10 @@ const albumArtists = computed(() => {
             <div>
               <div class="text-lg font-arial">{{ song.name }}</div>
               <div class="text-xs font-arial font-normal">
-                <div v-if="songArtists[songs[index]?.id]">
-                  <span v-for="(artist, idx) in songArtists[songs[index].id]" :key="artist.id">
+                <div v-if="songArtists[song.id]?.length">
+                  <span v-for="(artist, idx) in songArtists[song.id]" :key="artist.id">
                     {{ artist.displayName }}
-                    <span v-if="idx < songArtists[songs[index].id].length - 1">, </span>
+                    <span v-if="idx < songArtists[song.id].length - 1">, </span>
                   </span>
                 </div>
                 <div v-else>Unknown Artist</div>
@@ -239,6 +229,7 @@ const albumArtists = computed(() => {
         </div>
       </div>
     </PerfectScrollbar>
+
     <div
       v-if="showPlaylistModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
@@ -253,7 +244,7 @@ const albumArtists = computed(() => {
             <div
               v-for="playlist in playlists"
               :key="playlist.id"
-              @click="addSongToPlaylist(playlist.id)"
+              @click="addSongToPlaylist(playlist.id!)"
               class="p-3 rounded-md hover:bg-[#444] text-white cursor-pointer flex items-center gap-3"
             >
               <img

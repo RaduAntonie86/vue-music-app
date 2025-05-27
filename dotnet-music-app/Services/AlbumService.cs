@@ -32,12 +32,24 @@ public class AlbumService : IAlbumService
         try
         {
             var query = @"SELECT id, name, image_path AS ImagePath, release_date AS ReleaseDate 
-                        FROM public.album 
-                        WHERE id=@Id";
-            var parameters = new { id };
+                      FROM public.album 
+                      WHERE id=@Id";
+            var parameters = new { Id = id };
             var album = await _dbService.GetAsync<Album>(query, parameters);
+
+            if (album == null)
+            {
+                await _dbService.CommitTransactionAsync();
+                return null;
+            }
+
+            var songIds = await GetSongsFromAlbum(id);
+
             await _dbService.CommitTransactionAsync();
-            return AlbumDto.CopyAlbumToDto(album);
+
+            var albumDto = AlbumDto.CopyAlbumToDto(album);
+            albumDto.SongIds = songIds;
+            return albumDto;
         }
         catch
         {
@@ -53,8 +65,20 @@ public class AlbumService : IAlbumService
             var query = @"SELECT id, name, image_path AS ImagePath, release_date AS ReleaseDate 
                     FROM public.album";
             var albumList = await _dbService.GetAll<Album>(query, new { });
+
+            var albumDtos = new List<AlbumDto>();
+
+            foreach (var album in albumList)
+            {
+                var songIds = await GetSongsFromAlbum(album.Id);
+                var albumDto = AlbumDto.CopyAlbumToDto(album);
+                albumDto.SongIds = songIds;
+                albumDtos.Add(albumDto);
+            }
+
             await _dbService.CommitTransactionAsync();
-            return albumList.Select(AlbumDto.CopyAlbumToDto).ToList();
+
+            return albumDtos;
         }
         catch
         {
@@ -161,7 +185,7 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
-    private async Task AddSongsToAlbum(List<int> songIds, int albumId)
+    private async Task AddSongsToAlbum(List<long> songIds, int albumId)
     {
         foreach (var songId in songIds)
         {
@@ -175,7 +199,7 @@ public class AlbumService : IAlbumService
             await _dbService.EditData(query, parameters);
         }
     }
-    private async Task AddToGenreList(List<int> genreIds, int albumId)
+    private async Task AddToGenreList(List<long> genreIds, int albumId)
     {
         foreach (var genreId in genreIds)
         {
@@ -188,5 +212,12 @@ public class AlbumService : IAlbumService
             };
             await _dbService.EditData(query, parameters);
         }
+    }
+
+    private async Task<List<long>> GetSongsFromAlbum(int albumId)
+    {
+        var query = @"SELECT song_id FROM public.album_songs WHERE album_id = @AlbumId";
+        var songIds = await _dbService.GetAll<long>(query, new { AlbumId = albumId });
+        return songIds.ToList();
     }
 }

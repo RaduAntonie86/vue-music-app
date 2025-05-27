@@ -52,11 +52,17 @@ public class PlaylistController : Controller
         var result = await _playlistService.AddSongToPlaylist(playlist_id, song_id);
         return Ok(result);
     }
-    
+
     [HttpGet("user/{userId:int}")]
     public async Task<ActionResult<List<PlaylistDto>>> GetUserPlaylists(int userId)
     {
         var playlists = await _playlistService.GetPlaylistsByUserId(userId);
         return Ok(playlists);
+    }
+    [HttpGet("name/{name}")]
+    public async Task<IActionResult> GetPlaylistsByName(string name)
+    {
+        var result = await _playlistService.GetPlaylistsByName(name);
+        return Ok(result);
     }
 }

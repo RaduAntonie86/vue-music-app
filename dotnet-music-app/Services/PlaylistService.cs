@@ -28,7 +28,7 @@ public class PlaylistService : IPlaylistService
             playlist.Id = newId;
 
             await AddSongsToPlaylist(playlist.SongIds, playlist.Id);
-            await AddUserToPlaylist(playlist.UserId, playlist.Id);
+            await AddUsersToPlaylist(playlist.UserIds, playlist.Id);
             await _dbService.CommitTransactionAsync();
             return true;
         }
@@ -43,10 +43,23 @@ public class PlaylistService : IPlaylistService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT * FROM public.playlist";
-            var playlistList = await _dbService.GetAll<Playlist>(query, new { });
+            var query = @"
+            SELECT p.id, p.name, p.description, p.image_path AS ""ImagePath"",
+                ARRAY(
+                    SELECT ps.song_id 
+                    FROM public.playlist_songs ps 
+                    WHERE ps.playlist_id = p.id
+                ) AS ""SongIds"",
+                ARRAY(
+                    SELECT pu.user_id 
+                    FROM public.playlist_users pu 
+                    WHERE pu.playlist_id = p.id
+                ) AS ""UserIds""
+            FROM public.playlist p";
+
+            var playlistList = await _dbService.GetAll<PlaylistDto>(query, new { });
             await _dbService.CommitTransactionAsync();
-            return playlistList.Select(PlaylistDto.CopyPlaylistToDto).ToList();
+            return playlistList;
         }
         catch
         {
@@ -60,13 +73,29 @@ public class PlaylistService : IPlaylistService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT id, description, name, image_path AS ""ImagePath""
-                    FROM public.playlist 
-                    WHERE id=@Id";
-            var parameters = new { id };
-            var playlist = await _dbService.GetAsync<Playlist>(query, parameters);
+            var query = @"
+            SELECT 
+                p.id,
+                p.name,
+                p.description,
+                p.image_path AS ""ImagePath"",
+                ARRAY(
+                    SELECT ps.song_id 
+                    FROM public.playlist_songs ps 
+                    WHERE ps.playlist_id = p.id
+                ) AS ""SongIds"",
+                ARRAY(
+                    SELECT pu.user_id 
+                    FROM public.playlist_users pu 
+                    WHERE pu.playlist_id = p.id
+                ) AS ""UserIds""
+            FROM public.playlist p
+            WHERE p.id = @Id";
+
+            var parameters = new { Id = id };
+            var playlist = await _dbService.GetAsync<PlaylistDto>(query, parameters);
             await _dbService.CommitTransactionAsync();
-            return PlaylistDto.CopyPlaylistToDto(playlist);
+            return playlist;
         }
         catch
         {
@@ -157,16 +186,30 @@ public class PlaylistService : IPlaylistService
         try
         {
             var query = @"
-                SELECT p.*
-                FROM public.playlist p
-                INNER JOIN public.playlist_users pu ON pu.playlist_id = p.id
-                WHERE pu.user_id = @UserId";
-            
+            SELECT 
+                p.id,
+                p.name,
+                p.description,
+                p.image_path AS ""ImagePath"",
+                ARRAY(
+                    SELECT ps.song_id 
+                    FROM public.playlist_songs ps 
+                    WHERE ps.playlist_id = p.id
+                ) AS ""SongIds"",
+                ARRAY(
+                    SELECT pu2.user_id 
+                    FROM public.playlist_users pu2 
+                    WHERE pu2.playlist_id = p.id
+                ) AS ""UserIds""
+            FROM public.playlist p
+            INNER JOIN public.playlist_users pu ON pu.playlist_id = p.id
+            WHERE pu.user_id = @UserId";
+
             var parameters = new { UserId = userId };
-            var playlists = await _dbService.GetAll<Playlist>(query, parameters);
-            
+            var playlists = await _dbService.GetAll<PlaylistDto>(query, parameters);
+
             await _dbService.CommitTransactionAsync();
-            return playlists.Select(PlaylistDto.CopyPlaylistToDto).ToList();
+            return playlists;
         }
         catch
         {
@@ -175,7 +218,44 @@ public class PlaylistService : IPlaylistService
         }
     }
 
-    private async Task AddSongsToPlaylist(List<int> songIds, int playlistId)
+    public async Task<List<PlaylistDto>> GetPlaylistsByName(string name)
+    {
+        await _dbService.BeginTransactionAsync();
+        try
+        {
+            var query = @"
+        SELECT 
+            p.id,
+            p.name,
+            p.description,
+            p.image_path AS ""ImagePath"",
+            ARRAY(
+                SELECT ps.song_id 
+                FROM public.playlist_songs ps 
+                WHERE ps.playlist_id = p.id
+            ) AS ""SongIds"",
+            ARRAY(
+                SELECT pu.user_id 
+                FROM public.playlist_users pu 
+                WHERE pu.playlist_id = p.id
+            ) AS ""UserIds""
+        FROM public.playlist p
+        WHERE LOWER(p.name) LIKE LOWER(@Name)";
+
+            var parameters = new { Name = $"%{name}%" };
+            var playlists = await _dbService.GetAll<PlaylistDto>(query, parameters);
+
+            await _dbService.CommitTransactionAsync();
+            return playlists;
+        }
+        catch
+        {
+            await _dbService.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
+    private async Task AddSongsToPlaylist(List<long> songIds, int playlistId)
     {
         foreach (var songId in songIds)
         {
@@ -192,18 +272,21 @@ public class PlaylistService : IPlaylistService
             await _dbService.EditData(query, parameters);
         }
     }
-    private async Task AddUserToPlaylist(int userId, int playlistId)
+    private async Task AddUsersToPlaylist(List<long> userIds, int playlistId)
     {
         var query = @"
             INSERT INTO public.playlist_users (playlist_id, user_id)
             VALUES (@PlaylistId, @UserId)";
 
-        var parameters = new
+        foreach (var userId in userIds)
         {
-            PlaylistId = playlistId,
-            UserId = userId
-        };
+            var parameters = new
+            {
+                PlaylistId = playlistId,
+                UserId = userId
+            };
 
-        await _dbService.EditData(query, parameters);
+            await _dbService.EditData(query, parameters);
+        }
     }
 }
