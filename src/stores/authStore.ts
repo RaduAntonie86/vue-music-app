@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', {
         sessionStorage.setItem('authToken', token)
       }
       this.token = token
-      localStorage.setItem('authToken', token)  // This line always runs, overwriting sessionStorage case
+      localStorage.setItem('authToken', token) // This line always runs, overwriting sessionStorage case
     },
     clearToken() {
       this.token = null

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import router from '@/router'
-import axios from 'axios'
-import { computed, onMounted, ref, watch } from 'vue'
+import { Album } from '@/types/Album'
+import { Playlist } from '@/types/Playlist'
+import { User } from '@/types/User'
+import { onMounted, ref, watch } from 'vue'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
 const search = ref('')
@@ -28,27 +30,26 @@ const combinedMedia = ref<(Album | Playlist)[]>([])
 
 const searchAlbums = async () => {
   try {
-    let albumRes, playlistRes
+    let albumRes: Album[] = []
+    let playlistRes: Playlist[] = []
 
     if (!currentSearch.value || currentSearch.value.trim() === '') {
-      albumRes = await axios.get<Album[]>('http://localhost:5091/Album')
-      playlistRes = await axios.get<Playlist[]>('http://localhost:5091/Playlist')
+      albumRes = await Album.fetchAll()
+      playlistRes = await Playlist.fetchAll()
     } else {
-      albumRes = await axios.get<Album[]>(`http://localhost:5091/Album/name/${currentSearch.value}`)
-      playlistRes = await axios.get<Playlist[]>(
-        `http://localhost:5091/Playlist/name/${currentSearch.value}`
-      )
+      albumRes = await Album.fetchAlbumsByName(currentSearch.value)
+      playlistRes = await Playlist.fetchPlaylistsByName(currentSearch.value)
     }
 
-    albums.value = albumRes.data
-    console.log('Albums:', albumRes.data)
-    playlists.value = playlistRes.data
+    albums.value = albumRes
+    console.log('Albums:', albumRes)
+    playlists.value = playlistRes
 
-    for (const album of albumRes.data) {
+    for (const album of albumRes) {
       await fetchAlbumArtists(album.id!)
     }
 
-    combinedMedia.value = [...albumRes.data, ...playlistRes.data]
+    combinedMedia.value = [...albumRes, ...playlistRes]
   } catch (error) {
     console.error('Error fetching albums or playlists:', error)
   }
@@ -76,10 +77,9 @@ onMounted(() => {
 
 const fetchAlbumArtists = async (albumId: number) => {
   try {
-    const response = await axios.get<User[]>(`http://localhost:5091/User/album_id/${albumId}`)
-    // replace entire albumArtists object with updated property to trigger reactivity
-    albumArtists.value = { ...albumArtists.value, [albumId]: response.data }
-    console.log(`Artists for album ${albumId}:`, response.data)
+    const artists = await User.fetchAlbumArtists(albumId)
+    albumArtists.value = { ...albumArtists.value, [albumId]: artists }
+    console.log(`Artists for album ${albumId}:`, artists)
   } catch (error) {
     console.error(`Error fetching artists for album ${albumId}:`, error)
   }
@@ -129,7 +129,8 @@ const isAlbum = (item: Album | Playlist): item is Album => {
               <template v-if="isAlbum(item)">
                 <span v-if="item.id && albumArtists[item.id]">
                   <span v-for="(artist, i) in albumArtists[item.id]" :key="artist.id">
-                    {{ artist.displayName }}<span v-if="i < albumArtists[item.id].length - 1">, </span>
+                    {{ artist.displayName
+                    }}<span v-if="i < albumArtists[item.id].length - 1">, </span>
                   </span>
                 </span>
                 <span v-else>Unknown Artist</span>

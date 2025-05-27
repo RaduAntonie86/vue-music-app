@@ -18,7 +18,6 @@ const handleLogout = () => {
   authStore.clearAll()
   router.push('/login')
 }
-
 </script>
 
 <template>
@@ -34,13 +33,14 @@ const handleLogout = () => {
           v-if="!authStore.isLoggedIn"
           to="/login"
           class="font-arial text-white no-underline mb-3 text-5xl font-semibold"
-        >Log In
+          >Log In
         </RouterLink>
         <button
           v-else
           @click="handleLogout"
           class="font-arial text-white no-underline mb-3 text-5xl font-semibold"
-        >Log Out
+        >
+          Log Out
         </button>
       </div>
     </div>

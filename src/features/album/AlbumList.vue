@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/authStore'
 import { usePlayerStore } from '@/stores/usePlayerStore'
-import axios from 'axios'
+import { Album } from '@/types/Album'
+import { Playlist } from '@/types/Playlist'
+import { Song } from '@/types/Song'
+import { User } from '@/types/User'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
@@ -10,25 +13,27 @@ const route = useRoute()
 const albumId = ref(route.params.id)
 const authStore = useAuthStore()
 const store = usePlayerStore()
-
+const playlists = ref<Playlist[]>([])
+const showPlaylistModal = ref(false)
+const selectedSong = ref<Song | null>(null)
 const album = ref<Album | null>(null)
 const songs = ref<Song[]>([])
 const songArtists = ref<Record<number, User[]>>({})
 
 const fetchAlbum = async () => {
   try {
-    const response = await axios.get<Album>(`http://localhost:5091/Album/${albumId.value}`)
-    album.value = response.data
-
+    const id = Array.isArray(albumId.value) ? albumId.value[0] : albumId.value
+    const numericId = Number(id)
+    if (!isNaN(numericId)) {
+      album.value = await Album.fetchById(numericId)
+    } else {
+      console.error('Invalid album ID:', albumId.value)
+    }
     if (album.value?.songIds?.length) {
-      // Fetch songs by their IDs
-      const songRequests = album.value.songIds.map((id) =>
-        axios.get<Song>(`http://localhost:5091/Song/${id}`)
-      )
-      const songResponses = await Promise.all(songRequests)
-      songs.value = songResponses.map((res) => res.data)
+      const songRequests = album.value.songIds.map((id) => Song.fetchById(id))
+      const songsArray = await Promise.all(songRequests)
+      songs.value = songsArray
 
-      // Fetch artists for each song
       await Promise.all(songs.value.map((song) => fetchSongArtists(song.id)))
     } else {
       songs.value = []
@@ -40,8 +45,7 @@ const fetchAlbum = async () => {
 
 const fetchSongArtists = async (songId: number) => {
   try {
-    const response = await axios.get<User[]>(`http://localhost:5091/User/song_id/${songId}`)
-    songArtists.value[songId] = response.data
+    songArtists.value[songId] = await User.fetchSongArtists(songId)
   } catch (error) {
     console.error(`Error fetching artists for song ${songId}:`, error)
     songArtists.value[songId] = []
@@ -82,38 +86,15 @@ const playSong = (song: Song) => {
   }
 }
 
-watch(
-  () => route.params.id,
-  (newId) => {
-    albumId.value = newId
-    fetchAlbum()
-  }
-)
-
-onMounted(() => {
-  fetchAlbum()
-})
-
-const playlists = ref<Playlist[]>([])
-const showPlaylistModal = ref(false)
-const selectedSong = ref<Song | null>(null)
-
 const fetchPlaylists = async () => {
   if (authStore.isLoggedIn) {
     try {
-      const response = await axios.get<Playlist[]>(
-        `http://localhost:5091/Playlist/user/${authStore.userId}`
-      )
-      playlists.value = response.data
+      playlists.value = await Playlist.fetchFromUser(authStore.userId!)
     } catch (error) {
       console.error('Error fetching playlists:', error)
     }
   }
 }
-
-onMounted(() => {
-  fetchPlaylists()
-})
 
 const openPlaylistModal = (song: Song) => {
   selectedSong.value = song
@@ -128,15 +109,26 @@ const closePlaylistModal = () => {
 const addSongToPlaylist = async (playlistId: number) => {
   if (!selectedSong.value) return
   try {
-    await axios.post(
-      `http://localhost:5091/Playlist/${playlistId}/addSong/${selectedSong.value.id}`
-    )
+    Playlist.addSong(playlistId, selectedSong.value.id)
     console.log(`Added song ${selectedSong.value.id} to playlist ${playlistId}`)
     closePlaylistModal()
   } catch (error) {
     console.error('Error adding song to playlist:', error)
   }
 }
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    albumId.value = newId
+    fetchAlbum()
+  }
+)
+
+onMounted(() => {
+  fetchPlaylists()
+  fetchAlbum()
+})
 </script>
 
 <template>

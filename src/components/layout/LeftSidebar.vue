@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import axios from 'axios'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import router from '@/router'
 import { useAuthStore } from '@/stores/authStore'
+import { Playlist } from '@/types/Playlist'
 
 const playlists = ref<Playlist[]>([])
 const authStore = useAuthStore()
 
 const fetchPlaylists = async () => {
-  console.log('AuthStore userId:', authStore.userId); // <-- add this
+  console.log('AuthStore userId:', authStore.userId)
   try {
-    const response = await axios.get<Playlist[]>(`http://localhost:5091/Playlist/user/${authStore.userId}`);
-    playlists.value = response.data;
+    playlists.value = await Playlist.fetchFromUser(authStore.userId!)
   } catch (error) {
-    console.error('Error fetching playlists:', error);
+    console.error('Error fetching playlists:', error)
   }
-};
+}
 
 const handlePlaylistClick = (id: number) => {
   console.log('Clicked playlist ID:', id)
@@ -26,6 +25,16 @@ const handlePlaylistClick = (id: number) => {
 onMounted(() => {
   fetchPlaylists()
 })
+
+watch(
+  () => authStore.userId,
+  (newId) => {
+    if (newId) {
+      fetchPlaylists()
+    }
+  },
+  { immediate: true } // triggers the watcher right away on mount
+)
 </script>
 
 <style>

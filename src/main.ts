@@ -15,12 +15,12 @@ import PlaylistPreview from './features/playlist/PlaylistPreview.vue'
 import IconButton from './components/common/IconButton.vue'
 import Albums from './features/album/AlbumList.vue'
 
-import "bootstrap/dist/css/bootstrap.min.css"
-import "bootstrap"
-import "bootstrap-icons/font/bootstrap-icons.css"
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap'
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
-import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
-import 'vue3-perfect-scrollbar/style.css';
+import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar'
+import 'vue3-perfect-scrollbar/style.css'
 
 import App from './App.vue'
 import router from './router'

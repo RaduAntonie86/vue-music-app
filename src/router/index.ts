@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: AppPage 
+      component: AppPage
     },
     {
       path: '/playlist/:id',
@@ -46,7 +46,7 @@ const router = createRouter({
       path: '/create-playlist',
       name: 'create-playlist',
       component: CreatePlaylist
-    },
+    }
   ]
 })
 

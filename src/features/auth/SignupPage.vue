@@ -24,7 +24,7 @@ const handleSignup = async () => {
       body: JSON.stringify({
         displayName: display_name.value,
         username: username.value,
-        password: password.value,
+        password: password.value
       })
     })
 
@@ -36,7 +36,7 @@ const handleSignup = async () => {
     authStore.setUserId(data.id, rememberMe.value)
 
     console.log('Sign up success:', data)
-    router.push("/");
+    router.push('/')
   } catch (error) {
     console.error('', error)
   }
@@ -104,9 +104,9 @@ async function toSHA256(message: string): Promise<string> {
       Sign up
     </button>
   </div>
-  
+
   <div class="flex justify-center mt-5">
-    <RouterLink 
+    <RouterLink
       to="/login"
       class="text-white font-arial text-xl font-semibold bg-[#362323] rounded-xl px-2 py-1 no-underline"
     >

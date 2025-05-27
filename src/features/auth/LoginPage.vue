@@ -60,7 +60,8 @@ async function toSHA256(message: string): Promise<string> {
       v-model="username"
       class="form-control me-2 input-rounded text-[#efd0d0] bg-custom max-w-[30vh]"
       type="text"
-      placeholder="Username"/>
+      placeholder="Username"
+    />
   </div>
 
   <div class="flex justify-center mt-5">
@@ -89,9 +90,9 @@ async function toSHA256(message: string): Promise<string> {
       Login
     </button>
   </div>
-  
+
   <div class="flex justify-center mt-5">
-    <RouterLink 
+    <RouterLink
       to="/signup"
       class="text-white font-arial text-xl font-semibold bg-[#362323] rounded-xl px-2 py-1 no-underline"
     >

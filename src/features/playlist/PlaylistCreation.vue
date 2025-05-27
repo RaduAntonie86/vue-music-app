@@ -1,34 +1,36 @@
 <script setup lang="ts">
 import router from '@/router'
 import { useAuthStore } from '@/stores/authStore'
-import axios from 'axios'
+import { Album } from '@/types/Album'
+import { Playlist } from '@/types/Playlist'
+import { Song } from '@/types/Song'
+import { User } from '@/types/User'
 import { onMounted, ref } from 'vue'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
 const existingPlaylistIds = ref<number[]>([])
+const playlist_name = ref('')
+const playlist_description = ref('')
+const auth = useAuthStore()
+const songsForPlaylist = ref<Song[]>([])
+const songs = ref<Song[]>([])
+const songArtists = ref<Record<number, User[]>>({})
+const albums = ref<Record<number, Album>>({})
 
 const fetchPlaylists = async () => {
   try {
-    const response = await axios.get<Playlist[]>(`http://localhost:5091/Playlist`)
-    existingPlaylistIds.value = response.data
-      .map(p => p.id)
-      .filter((id): id is number => id !== undefined);
+    const playlists = await Playlist.fetchAll()
+    if (!playlists) {
+      existingPlaylistIds.value = []
+      return
+    }
+    existingPlaylistIds.value = playlists
+      .map((p) => p.id)
+      .filter((id): id is number => id !== undefined)
   } catch (error) {
     console.error('Error fetching playlists:', error)
   }
 }
-
-const playlist_name = ref('')
-const playlist_description = ref('')
-
-onMounted(() => {
-  fetchSongs()
-  fetchPlaylists()
-})
-
-const auth = useAuthStore()
-
-const songsForPlaylist = ref<Song[]>([])
 
 const addToPlaylist = (song: Song) => {
   const index = songsForPlaylist.value.findIndex((s) => s.id === song.id)
@@ -43,15 +45,11 @@ const isSelected = (songId: number): boolean => {
   return songsForPlaylist.value.some((s) => s.id === songId)
 }
 
-const songs = ref<Song[]>([])
-
 const fetchSongs = async () => {
   try {
-    const response = await axios.get<Song[]>(`http://localhost:5091/Song`)
-    songs.value = response.data
+    songs.value = await Song.fetchAll()
 
-    for (const song of response.data) {
-      console.log(song)
+    for (const song of songs.value) {
       await fetchSongArtists(song.id)
       await fetchSongAlbum(song.id)
     }
@@ -60,23 +58,18 @@ const fetchSongs = async () => {
   }
 }
 
-const songArtists = ref<Record<number, User[]>>({})
-
 const fetchSongArtists = async (songId: number) => {
   try {
-    const response = await axios.get<User[]>(`http://localhost:5091/User/song_id/${songId}`)
-    songArtists.value[songId] = response.data
+    const users = await User.fetchSongArtists(songId)
+    songArtists.value[songId] = users
   } catch (error) {
     console.error(`Error fetching artists for album ${songId}:`, error)
   }
 }
 
-const albums = ref<Record<number, Album>>({})
-
 const fetchSongAlbum = async (songId: number) => {
   try {
-    const response = await axios.get<Album>(`http://localhost:5091/Album/song_id/${songId}`)
-    albums.value[songId] = response.data
+    albums.value[songId] = await Album.fetchAlbumForSong(songId)
   } catch (error) {
     console.error(`Error fetching album for song ${songId}:`, error)
   }
@@ -102,22 +95,25 @@ const createPlaylist = async () => {
   }
 
   try {
-    const payload: Playlist = {
+    const payload = {
       name: playlist_name.value,
       description: playlist_description.value,
       imagePath: '',
-      userIds: [auth.userId], // ✅ now an array
-      songIds: songsForPlaylist.value.map(song => song.id)
-    };
-
-    const response = await axios.post('http://localhost:5091/Playlist/add', payload);
-
-    console.log('Playlist created successfully:', response.data);
-    router.push('/');
+      userIds: [auth.userId],
+      songIds: songsForPlaylist.value.map((song) => song.id)
+    } as Playlist
+    Playlist.createPlaylist(payload)
+    console.log('Playlist created successfully')
+    router.push('/')
   } catch (error) {
-    console.error('Error creating playlist:', error);
+    console.error('Error creating playlist:', error)
   }
-};
+}
+
+onMounted(() => {
+  fetchSongs()
+  fetchPlaylists()
+})
 </script>
 
 <template>
@@ -166,12 +162,16 @@ const createPlaylist = async () => {
         <div class="grid grid-cols-6 p-2 mx-2 font-arial font-bold">
           <div class="col-span-2">
             <div class="flex align-middle place-items-center mb-2 mt-2">
-            <img
-              class="rounded-lg mr-2.5"
-              :src="albums[song.id]?.imagePath && albums[song.id].imagePath.trim() !== '' ? albums[song.id].imagePath : 'images/albums/album.jpeg'"
-              width="50"
-              height="50"
-            />
+              <img
+                class="rounded-lg mr-2.5"
+                :src="
+                  albums[song.id]?.imagePath && albums[song.id].imagePath.trim() !== ''
+                    ? albums[song.id].imagePath
+                    : 'images/albums/album.jpeg'
+                "
+                width="50"
+                height="50"
+              />
               <div>
                 <div class="text-lg font-arial">{{ song.name }}</div>
                 <div class="text-xs font-arial font-normal">

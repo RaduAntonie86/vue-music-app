@@ -2,6 +2,8 @@
 import { ref, computed, watch } from 'vue'
 import { useMediaControls } from '@vueuse/core'
 import { usePlayerStore } from '@/stores/usePlayerStore'
+import type { Song } from '@/types/Song'
+import type { User } from '@/types/User'
 
 const store = usePlayerStore()
 
@@ -17,7 +19,7 @@ const currentSong = computed(() => store.currentSong)
 
 watch(
   () => store.playlist,
-  (val) => {
+  (val: Song[]) => {
     console.log(
       'Playlist changed',
       val.map((s) => s.name)
@@ -159,28 +161,23 @@ function setVolume(newPercent: number) {
 }
 
 const imageSource = computed(() => {
-  const path = store.currentAlbum?.imagePath?.trim();
-  return path ? path : 'images/albums/album.jpeg';
-});
+  const path = store.currentAlbum?.imagePath?.trim()
+  return path ? path : 'images/albums/album.jpeg'
+})
 </script>
 
 <template>
   <div class="bg-[#362323]">
     <div class="grid grid-cols-3 md:grid-cols-5 gap-2 items-center">
       <div class="flex align-middle items-center">
-        <img
-          class="rounded-3xl mr-[10px]"
-          :src="imageSource"
-          width="70"
-          height="70"
-        />
+        <img class="rounded-3xl mr-[10px]" :src="imageSource" width="70" height="70" />
         <div>
           <div class="text-white text-lg font-arial">
             {{ store.currentSong?.name || 'No song playing' }}
           </div>
           <div class="text-white text-xs font-arial">
             {{
-              store.currentArtists.map((artist) => artist.displayName).join(', ') ||
+              (store.currentArtists as User[]).map((artist) => artist.displayName).join(', ') ||
               'Unknown Artist'
             }}
           </div>
