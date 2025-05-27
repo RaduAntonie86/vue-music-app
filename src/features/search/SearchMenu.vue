@@ -87,7 +87,7 @@ const fetchAlbumArtists = async (albumId: number) => {
               :src="
                 album.imagePath && album.imagePath.trim() !== ''
                   ? album.imagePath
-                  : '/assets/images/album.jpeg'
+                  : 'images/albums/album.jpeg'
               "
               class="rounded-3xl"
               width="120"

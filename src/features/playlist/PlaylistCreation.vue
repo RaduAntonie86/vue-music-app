@@ -164,7 +164,7 @@ const createPlaylist = async () => {
             <div class="flex align-middle place-items-center mb-2 mt-2">
               <img
                 class="rounded-lg mr-2.5"
-                :src="albums[index]?.imagePath && albums[index].imagePath.trim() !== '' ? albums[index].imagePath : '/assets/images/album.jpeg'" 
+                :src="albums[index]?.imagePath && albums[index].imagePath.trim() !== '' ? albums[index].imagePath : 'images/albums/album.jpeg'" 
                 width="50"
                 height="50"
               />

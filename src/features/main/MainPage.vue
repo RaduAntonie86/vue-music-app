@@ -2,7 +2,6 @@
   import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
-  import albumImage from '@/assets/images/album.jpeg';
 
   const songs = ref<Song[]>([]);
 
@@ -29,7 +28,7 @@
                 <album-preview 
                 albumName="Album Name" 
                 artistName="Artist Name"
-                :imagePath="albumImage"></album-preview>
+                imagePath="images/albums/album.jpeg"></album-preview>
               <!-- </div> --> 
             </div>
       </div>

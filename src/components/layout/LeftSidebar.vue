@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import playlistImage from '../../assets/images/album.jpeg'
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import router from '@/router';
@@ -37,7 +36,7 @@ import router from '@/router';
       <playlist-preview 
         :playlistName="playlist.name"
         :description="playlist.description" 
-        :imagePath="playlist.imagePath ? playlist.imagePath : playlistImage">
+        :imagePath="playlist.imagePath ? playlist.imagePath : '/images/albums/album.jpeg'">
       </playlist-preview>
     </div>
 </PerfectScrollbar>

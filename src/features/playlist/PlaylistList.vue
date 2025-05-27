@@ -16,6 +16,8 @@ onMounted(() => {
   fetchPlaylistSongs()
   fetchPlaylistAlbums()
   fetchPlaylistUsers()
+  if (playlist.value?.imagePath !== undefined && playlist.value?.imagePath !== null)
+    console.log(playlist.value?.imagePath)
 })
 
 const store = usePlayerStore()
@@ -40,6 +42,8 @@ watch(
     fetchPlaylistSongs()
     fetchPlaylistAlbums()
     fetchPlaylistUsers()
+    if (playlist.value?.imagePath !== undefined && playlist.value?.imagePath !== null)
+      console.log(playlist.value?.imagePath)
   }
 )
 
@@ -155,7 +159,10 @@ const songToAlbumMap = computed(() => {
   <div class="bg-[#362323] rounded-md">
     <div class="flex align-middle place-items-center p-4">
       <img class="rounded-3xl mr-4" 
-      :src="playlist?.imagePath && playlist.imagePath.trim() !== '' ? playlist.imagePath : '/assets/images/album.jpeg'"  
+      :src="playlist?.imagePath && 
+            playlist.imagePath.trim() !== '' ? 
+            playlist.imagePath : 
+            '/images/albums/album.jpeg'"  
       width="250" 
       height="250" />
       <div class="mt-[50px]">
@@ -179,7 +186,7 @@ const songToAlbumMap = computed(() => {
               (e) => {
                 const img = e.target as HTMLImageElement
                 if (!img.src.endsWith('/user.jpg')) {
-                  img.src = '/images/user.jpg'
+                  img.src = '/images/users/user.jpg'
                 }
               }
             "
@@ -222,7 +229,7 @@ const songToAlbumMap = computed(() => {
     <div class="mx-2">
       <mat-divider></mat-divider>
     </div>
-    <PerfectScrollbar class="min-h-[40vh] max-h-[60vh] overflow-hidden">
+    <PerfectScrollbar class="min-h-[40vh] max-h-[20vh] overflow-hidden">
       <button
         v-for="(song, index) in songs"
         :key="song.id"
@@ -235,7 +242,7 @@ const songToAlbumMap = computed(() => {
             <div class="flex align-middle place-items-center mb-2 mt-2">
               <img
                 class="rounded-lg mr-2.5"
-                :src="albums[index]?.imagePath && albums[index].imagePath.trim() !== '' ? albums[index].imagePath : '/assets/images/album.jpeg'" 
+                :src="albums[index]?.imagePath && albums[index].imagePath.trim() !== '' ? albums[index].imagePath : 'images/albums/album.jpeg'" 
                 width="50"
                 height="50"
               />

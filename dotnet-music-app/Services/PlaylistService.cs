@@ -126,6 +126,55 @@ public class PlaylistService : IPlaylistService
         }
     }
 
+    public async Task<bool> AddSongToPlaylist(int playlistId, int songId)
+    {
+        await _dbService.BeginTransactionAsync();
+        try
+        {
+            var query = @"
+            INSERT INTO public.playlist_songs (playlist_id, song_id)
+            VALUES (@PlaylistId, @SongId)";
+
+            var parameters = new
+            {
+                PlaylistId = playlistId,
+                SongId = songId
+            };
+
+            await _dbService.EditData(query, parameters);
+            await _dbService.CommitTransactionAsync();
+            return true;
+        }
+        catch
+        {
+            await _dbService.RollbackTransactionAsync();
+            throw;
+        }
+    }
+    public async Task<List<PlaylistDto>> GetPlaylistsByUserId(int userId)
+    {
+        await _dbService.BeginTransactionAsync();
+        try
+        {
+            var query = @"
+                SELECT p.*
+                FROM public.playlist p
+                INNER JOIN public.playlist_users pu ON pu.playlist_id = p.id
+                WHERE pu.user_id = @UserId";
+            
+            var parameters = new { UserId = userId };
+            var playlists = await _dbService.GetAll<Playlist>(query, parameters);
+            
+            await _dbService.CommitTransactionAsync();
+            return playlists.Select(PlaylistDto.CopyPlaylistToDto).ToList();
+        }
+        catch
+        {
+            await _dbService.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
     private async Task AddSongsToPlaylist(List<int> songIds, int playlistId)
     {
         foreach (var songId in songIds)

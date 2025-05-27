@@ -157,6 +157,11 @@ function toggleMute() {
 function setVolume(newPercent: number) {
   volume.value = newPercent / 100
 }
+
+const imageSource = computed(() => {
+  const path = store.currentAlbum?.imagePath?.trim();
+  return path ? path : 'images/albums/album.jpeg';
+});
 </script>
 
 <template>
@@ -165,13 +170,7 @@ function setVolume(newPercent: number) {
       <div class="flex align-middle items-center">
         <img
           class="rounded-3xl mr-[10px]"
-          :src="
-            store.currentAlbum &&
-            store.currentAlbum.imagePath &&
-            store.currentAlbum.imagePath.trim() !== ''
-              ? store.currentAlbum.imagePath
-              : '/assets/images/album.jpeg'
-          "
+          :src="imageSource"
           width="70"
           height="70"
         />
