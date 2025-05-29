@@ -23,7 +23,8 @@ const shuffle = ref(false)
 const muted = ref(false)
 const previousVolume = ref(volume.value)
 const authStore = useAuthStore()
-const MINIMUM_LISTENING_TIME = 3
+const MINIMUM_LISTENING_TIME = 10
+let lastTime = 0;
 
 watch(
   () => store.playlist,
@@ -63,7 +64,6 @@ watch(currentSong, (newSong, oldSong) => {
   }
 })
 
-let lastTime = 0;
 watch(audio, (el) => {
   if (el) {
     el.addEventListener('timeupdate', () => {
@@ -190,11 +190,6 @@ const imageSource = computed(() => {
 })
 
 async function sendListeningHistory(songId: number, listeningTime: number) {
-  console.log('Sending listening history:', {
-    userId: authStore.userId,
-    songId,
-    listeningTime,
-  });
   if(authStore.isLoggedIn)
   {
     try {
