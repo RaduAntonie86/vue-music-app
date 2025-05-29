@@ -163,6 +163,18 @@ onMounted(() => {
   fetchPlaylist()
   fetchUserPlaylists()
 })
+
+const userImageSource = computed(() => {
+  const path = firstUser.value?.imagePath?.trim()
+
+  if (!path) return '/images/users/user.jpg'
+
+  if (path.startsWith('/') || path.includes('images/')) {
+    return path
+  }
+
+  return `/images/users/${path}`
+})
 </script>
 
 <template>
@@ -188,22 +200,16 @@ onMounted(() => {
         </div>
         <div class="text-white text-lg font-arial">Made by:</div>
         <div class="flex align-middle place-items-center mb-2 mt-2">
-          <img
-            class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
-            :src="
-              firstUser && firstUser.imagePath?.trim() !== ''
-                ? firstUser.imagePath
-                : '/images/users/user.jpg'
-            "
-            @error="
-              (e) => {
-                const img = e.target as HTMLImageElement
-                if (!img.src.endsWith('/user.jpg')) {
-                  img.src = '/images/users/user.jpg'
-                }
-              }
-            "
-          />
+        <img
+          class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
+          :src="userImageSource"
+          @error="(e) => {
+            const img = e.target as HTMLImageElement
+            if (!img.src.endsWith('/user.jpg')) {
+              img.src = '/images/users/user.jpg'
+            }
+          }"
+        />
           <div class="flex items-center text-white text-md font-arial">
             <div
               v-if="playlistUserIds.length > 0 && usersById.size > 0"

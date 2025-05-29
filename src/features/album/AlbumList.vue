@@ -117,6 +117,19 @@ const addSongToPlaylist = async (playlistId: number) => {
   }
 }
 
+const artistImageSource = computed(() => {
+  const firstArtist = albumArtists.value[0]
+  const path = firstArtist?.imagePath?.trim()
+
+  if (!path) return '/images/users/user.jpg'
+
+  if (path.startsWith('/') || path.includes('images/')) {
+    return path
+  }
+
+  return `/images/users/${path}`
+})
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -146,14 +159,16 @@ onMounted(() => {
           {{ album?.name || 'Loading...' }}
         </div>
         <div class="flex align-middle place-items-center mb-2 mt-2">
-          <img
-            class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
-            :src="
-              albumArtists.length && albumArtists[0].imagePath?.trim()
-                ? albumArtists[0].imagePath
-                : '/assets/images/user.jpg'
-            "
-          />
+        <img
+          class="rounded-full mr-2.5 aspect-square object-cover w-[30px] h-[30px]"
+          :src="artistImageSource"
+          @error="(e) => {
+            const img = e.target as HTMLImageElement
+            if (!img.src.endsWith('/user.jpg')) {
+              img.src = '/images/users/user.jpg'
+            }
+          }"
+        />
           <div>
             <div v-if="albumArtists.length > 0" class="flex flex-wrap gap-x-1">
               <button v-for="user in albumArtists" :key="user.id" class="hover:text-[#888888]">
