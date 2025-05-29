@@ -37,12 +37,6 @@ public class AlbumService : IAlbumService
             var parameters = new { Id = id };
             var album = await _dbService.GetAsync<Album>(query, parameters);
 
-            if (album == null)
-            {
-                await _dbService.CommitTransactionAsync();
-                return null;
-            }
-
             var songIds = await GetSongsFromAlbum(id);
 
             await _dbService.CommitTransactionAsync();
@@ -119,7 +113,7 @@ public class AlbumService : IAlbumService
             var parameters = new { SongId = song_id };
             var album = await _dbService.GetAsync<Album>(query, parameters);
             await _dbService.CommitTransactionAsync();
-            return album != null ? AlbumDto.CopyAlbumToDto(album) : null;
+            return AlbumDto.CopyAlbumToDto(album);
         }
         catch
         {
@@ -217,7 +211,8 @@ public class AlbumService : IAlbumService
     private async Task<List<long>> GetSongsFromAlbum(int albumId)
     {
         var query = @"SELECT song_id FROM public.album_songs WHERE album_id = @AlbumId";
-        var songIds = await _dbService.GetAll<long>(query, new { AlbumId = albumId });
+        var parameters = new { AlbumId = albumId };
+        var songIds = await _dbService.GetAll<long>(query, parameters);
         return songIds.ToList();
     }
 }
