@@ -4,20 +4,26 @@ import { useMediaControls } from '@vueuse/core'
 import { usePlayerStore } from '@/stores/usePlayerStore'
 import type { Song } from '@/types/Song'
 import type { User } from '@/types/User'
+import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
 
+const secondsListened = ref(0)
 const store = usePlayerStore()
-
 const audio = ref<HTMLAudioElement | null>(null)
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-
 const songPath = computed(() =>
   store.currentSong ? `${API_BASE_URL}/Song/stream/${store.currentSong.id}` : ''
 )
-
 const { playing, volume } = useMediaControls(audio)
-
 const currentSong = computed(() => store.currentSong)
+const currentTime = ref(0)
+const duration = ref(0)
+const repeat = ref(false)
+const shuffle = ref(false)
+const muted = ref(false)
+const previousVolume = ref(volume.value)
+const authStore = useAuthStore()
+const MINIMUM_LISTENING_TIME = 3
 
 watch(
   () => store.playlist,
@@ -29,7 +35,14 @@ watch(
   }
 )
 
-watch(currentSong, (newSong) => {
+watch(currentSong, (newSong, oldSong) => {
+  if (oldSong && secondsListened.value >= MINIMUM_LISTENING_TIME) {
+    sendListeningHistory(oldSong.id, secondsListened.value)
+    console.log('Sent song.')
+  }
+  console.log(secondsListened.value)
+
+  secondsListened.value = 0
   if (newSong && audio.value) {
     const tryPlay = () => {
       audio.value
@@ -50,20 +63,28 @@ watch(currentSong, (newSong) => {
   }
 })
 
-const currentTime = ref(0)
-const duration = ref(0)
-
+let lastTime = 0;
 watch(audio, (el) => {
   if (el) {
     el.addEventListener('timeupdate', () => {
-      currentTime.value = el.currentTime
-    })
+      const current = el.currentTime;
+      currentTime.value = current;
+      if (current > lastTime) {
+        secondsListened.value += current - lastTime;
+      }
+
+      lastTime = current;
+    });
+
     el.addEventListener('loadedmetadata', () => {
-      duration.value = el.duration
-    })
-    el.addEventListener('ended', nextSong)
+      duration.value = el.duration;
+      lastTime = 0;
+      secondsListened.value = 0;
+    });
+
+    el.addEventListener('ended', nextSong);
   }
-})
+});
 
 function seekAudio(percent: number) {
   if (audio.value && duration.value) {
@@ -128,12 +149,6 @@ const selectPreviousSong = () => {
     }
   }
 }
-const repeat = ref(false)
-
-const shuffle = ref(false)
-
-const muted = ref(false)
-const previousVolume = ref(volume.value)
 
 function toggleRepeat() {
   repeat.value = !repeat.value
@@ -166,6 +181,30 @@ const imageSource = computed(() => {
   const path = store.currentAlbum?.imagePath?.trim()
   return path ? path : 'images/albums/album.jpeg'
 })
+
+async function sendListeningHistory(songId: number, listeningTime: number) {
+  console.log('Sending listening history:', {
+    userId: authStore.userId,
+    songId,
+    listeningTime,
+  });
+  if(authStore.isLoggedIn)
+  {
+    try {
+      await axios.post(`${API_BASE_URL}/ListeningHistory/listen`, {
+        userId: authStore.userId,
+        songId,
+        listeningTime
+      })
+    } catch (error) {
+      console.error('Failed to send listening history:', error)
+    }
+  }
+  else
+  {
+    console.log('No user logged in.')
+  }
+}
 </script>
 
 <template>
@@ -216,8 +255,8 @@ const imageSource = computed(() => {
 
         <div class="flex justify-center w-full mt-2">
           <track-bar
-            width="250"
-            height="9"
+            :width="250"
+            :height="9"
             :percent="(currentTime / duration) * 100"
             @input="seekAudio"
           />
@@ -239,7 +278,11 @@ const imageSource = computed(() => {
           @click="toggleMute"
           class="mr-2 text-white text-2xl hover:text-3xl"
         ></icon-button>
-        <track-bar width="220" height="11" :percent="volume * 100" @input="setVolume" />
+        <track-bar 
+        :width="220" 
+        :height="11" 
+        :percent="volume * 100" 
+        @input="setVolume" />
       </div>
     </div>
   </div>
