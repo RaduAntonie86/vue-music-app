@@ -1,4 +1,5 @@
 import type { Album } from '@/types/Album'
+import type { PlaylistItem } from '@/types/PlaylistItem'
 import type { Song } from '@/types/Song'
 import type { User } from '@/types/User'
 import { defineStore } from 'pinia'
@@ -36,27 +37,13 @@ export const usePlayerStore = defineStore('player', {
       }
     },
     shufflePlaylist() {
-      const currentSong = this.playlist[this.currentIndex]
-      const currentArtists = this.artists[this.currentIndex]
-      const currentAlbum = this.albums[this.currentIndex]
-
-      const combined = this.playlist.map((song, i) => ({
+      const combined: PlaylistItem[] = this.playlist.map((song, i) => ({
         song,
         artistGroup: this.artists[i],
-        album: this.albums[i]
+        album: this.albums[i],
       }))
 
-      const remaining = combined.filter((_, i) => i !== this.currentIndex)
-
-      for (let i = remaining.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[remaining[i], remaining[j]] = [remaining[j], remaining[i]]
-      }
-
-      const shuffled = [
-        { song: currentSong, artistGroup: currentArtists, album: currentAlbum },
-        ...remaining
-      ]
+      const shuffled = shuffleArray(combined, this.currentIndex)
 
       this.playlist = shuffled.map((s) => s.song)
       this.artists = shuffled.map((s) => s.artistGroup)
@@ -72,3 +59,15 @@ export const usePlayerStore = defineStore('player', {
     }
   }
 })
+function shuffleArray(arr: PlaylistItem[], currentIndex: number) {
+  const currentItem = arr[currentIndex]
+  const remaining = arr.filter((_, i) => i !== currentIndex)
+
+  for (let i = remaining.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[remaining[i], remaining[j]] = [remaining[j], remaining[i]]
+  }
+
+  return [currentItem, ...remaining]
+}
+

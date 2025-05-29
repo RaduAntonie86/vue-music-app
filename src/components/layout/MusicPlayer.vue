@@ -9,8 +9,10 @@ const store = usePlayerStore()
 
 const audio = ref<HTMLAudioElement | null>(null)
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 const songPath = computed(() =>
-  store.currentSong ? `http://localhost:5091/Song/stream/${store.currentSong.id}` : ''
+  store.currentSong ? `${API_BASE_URL}/Song/stream/${store.currentSong.id}` : ''
 )
 
 const { playing, volume } = useMediaControls(audio)
