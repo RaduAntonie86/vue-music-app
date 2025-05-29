@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PlaylistPage from '@/components/PlaylistPage.vue'
-import MainPage from '@/components/MainPage.vue'
-import SearchPage from '@/components/SearchPage.vue'
-import AlbumPage from '@/components/AlbumPage.vue'
+import PlaylistPage from '@/features/playlist/PlaylistPage.vue'
+import AppPage from '@/features/main/AppPage.vue'
+import SearchPage from '@/features/search/SearchPage.vue'
+import AlbumPage from '@/features/album/AlbumPage.vue'
+import LoginPage from '@/features/auth/LoginPage.vue'
+import SignupPage from '@/features/auth/SignupPage.vue'
+import CreatePlaylist from '@/features/playlist/CreatePlaylist.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,12 +13,13 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: MainPage
+      component: AppPage
     },
     {
-      path: '/playlist',
+      path: '/playlist/:id',
       name: 'playlist',
-      component: PlaylistPage
+      component: PlaylistPage,
+      props: true
     },
     {
       path: '/search',
@@ -23,9 +27,25 @@ const router = createRouter({
       component: SearchPage
     },
     {
-      path: '/album',
+      path: '/login',
+      name: 'login',
+      component: LoginPage
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupPage
+    },
+    {
+      path: '/album/:id',
       name: 'album',
-      component: AlbumPage
+      component: AlbumPage,
+      props: true
+    },
+    {
+      path: '/create-playlist',
+      name: 'create-playlist',
+      component: CreatePlaylist
     }
   ]
 })

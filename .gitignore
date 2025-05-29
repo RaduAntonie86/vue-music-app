@@ -72,6 +72,8 @@ x64/
 *.tlh
 *.tmp
 *.log
+*.jpeg
+*.7z
 *.vspscc
 *.vssscc
 .builds
@@ -198,6 +200,7 @@ dlldata.c
 # DNX
 project.lock.json
 project.fragment.lock.json
+appsettings.json
 artifacts/
 
 *_i.c
@@ -224,6 +227,8 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
+*.jpg
+*.png
 
 # Chutzpah Test files
 _Chutzpah*

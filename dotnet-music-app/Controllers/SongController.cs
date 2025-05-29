@@ -2,17 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]")]
-public class SongsController : Controller
+public class SongController : Controller
 {
     private readonly ISongService _songService;
     
-    public SongsController(ISongService songService)
+    public SongController(ISongService songService)
     {
         _songService = songService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> GetSongList()
     {
         var result =  await _songService.GetSongList();
 
@@ -23,6 +23,22 @@ public class SongsController : Controller
     public async Task<IActionResult> GetSong(int id)
     {
         var result =  await _songService.GetSong(id);
+
+        return Ok(result);
+    }
+
+    [HttpGet("playlist_id/{playlist_id:int}")]
+    public async Task<IActionResult> GetSongsFromPlaylist(int playlist_id)
+    {
+        var result =  await _songService.GetSongsFromPlaylist(playlist_id);
+
+        return Ok(result);
+    }
+    
+    [HttpGet("album_id/{album_id:int}")]
+    public async Task<IActionResult> GetSongsFromAlbum(int album_id)
+    {
+        var result =  await _songService.GetSongsFromAlbum(album_id);
 
         return Ok(result);
     }
@@ -51,11 +67,9 @@ public class SongsController : Controller
         return Ok(result);
     }
 
-    // New method to stream song audio
     [HttpGet("stream/{id:int}")]
     public async Task<IActionResult> StreamSong(int id)
     {
-        // Fetch the song details (including file path) from the database
         var song = await _songService.GetSong(id);
 
         if (song == null)
@@ -63,7 +77,6 @@ public class SongsController : Controller
             return NotFound();
         }
 
-        // Assuming song.FilePath holds the path to the audio file
         var filePath = song.Path;
 
         if (!System.IO.File.Exists(filePath))

@@ -2,45 +2,44 @@ using Dapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
-DefaultTypeMap.MatchNamesWithUnderscores = true;
+builder.Services.AddScoped<IDbService, MusicAppDbService>();
+builder.Services.AddScoped<ISongService, SongService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPlaylistService, PlaylistService>();
+builder.Services.AddScoped<IAlbumService, AlbumService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Add services to the container
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IDbService, MusicAppDbService>();
-builder.Services.AddScoped<ISongService, SongService>();
 
-// Configure CORS
+var frontendUrl = builder.Configuration["Frontend:BaseUrl"];
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",  // This is the policy name you define
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173") // Allow Vue.js frontend origin
-                  .AllowAnyHeader()                     // Allow all headers
-                  .AllowAnyMethod();                    // Allow all methods (GET, POST, PUT, etc.)
-        });
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins(frontendUrl)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Ensure HTTPS is redirected
+SqlMapper.AddTypeHandler(new DateOnlyHandler());
+SqlMapper.AddTypeHandler(new ListLongHandler());
+
 app.UseHttpsRedirection();
-
-// Add CORS middleware BEFORE Authorization
-app.UseCors("AllowSpecificOrigin"); // Add this to use the CORS policy
-
-// Add Authorization middleware
+app.UseCors("AllowSpecificOrigin");
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
