@@ -179,7 +179,14 @@ function setVolume(newPercent: number) {
 
 const imageSource = computed(() => {
   const path = store.currentAlbum?.imagePath?.trim()
-  return path ? path : 'images/albums/album.jpeg'
+
+  if (!path) return '/images/albums/album.jpeg'
+
+  if (path.startsWith('/') || path.includes('images/')) {
+    return path
+  }
+
+  return `/images/albums/${path}`
 })
 
 async function sendListeningHistory(songId: number, listeningTime: number) {

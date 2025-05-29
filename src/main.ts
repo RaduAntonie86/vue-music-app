@@ -27,6 +27,7 @@ import router from './router'
 import SearchMenu from './features/search/SearchMenu.vue'
 import PlaylistList from './features/playlist/PlaylistList.vue'
 import PlaylistCreation from './features/playlist/PlaylistCreation.vue'
+import CustomDivider from './components/common/CustomDivider.vue'
 
 const app = createApp(App)
 app.use(createPinia())
@@ -42,6 +43,7 @@ app.component('album-page', AlbumPage)
 app.component('album-list', Albums)
 app.component('album-preview', AlbumPreview)
 app.component('track-bar', TrackBar)
+app.component('custom-divider', CustomDivider)
 app.component('playlist-preview', PlaylistPreview)
 app.component('icon-button', IconButton)
 app.component('playlist-creation', PlaylistCreation)

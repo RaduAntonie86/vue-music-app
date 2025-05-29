@@ -45,6 +45,6 @@ const handleLogout = () => {
       </div>
     </div>
     <RouterView />
-    <MusicPlayer v-if="showPlayer" class="p-2" />
+    <MusicPlayer v-if="showPlayer" />
   </div>
 </template>
