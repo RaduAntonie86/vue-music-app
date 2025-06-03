@@ -5,4 +5,5 @@ public interface IGenreService
     Task<GenreDto> GetGenre(int id);
     Task<GenreDto> UpdateGenre(Genre genre);
     Task<bool> DeleteGenre(int key);
+    Task<List<GenreDto>> GetGenresByIds(List<int> ids);
 }

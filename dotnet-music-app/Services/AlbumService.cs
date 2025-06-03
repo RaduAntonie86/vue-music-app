@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components.Forms;
+
 public class AlbumService : IAlbumService
 {
     private readonly IDbService _dbService;
@@ -34,15 +36,15 @@ public class AlbumService : IAlbumService
             var query = @"SELECT id, name, image_path AS ImagePath, release_date AS ReleaseDate 
                       FROM public.album 
                       WHERE id=@Id";
-            var parameters = new { Id = id };
-            var album = await _dbService.GetAsync<Album>(query, parameters);
-
+            var album = await _dbService.GetAsync<Album>(query, new { Id = id });
             var songIds = await GetSongsFromAlbum(id);
+            var genreIds = await GetGenreIdsFromAlbum(id);
 
             await _dbService.CommitTransactionAsync();
 
             var albumDto = AlbumDto.CopyAlbumToDto(album);
             albumDto.SongIds = songIds;
+            albumDto.GenreIds = genreIds;
             return albumDto;
         }
         catch
@@ -65,8 +67,12 @@ public class AlbumService : IAlbumService
             foreach (var album in albumList)
             {
                 var songIds = await GetSongsFromAlbum(album.Id);
+                var genreIds = await GetGenreIdsFromAlbum(album.Id);
+
                 var albumDto = AlbumDto.CopyAlbumToDto(album);
                 albumDto.SongIds = songIds;
+                albumDto.GenreIds = genreIds;
+
                 albumDtos.Add(albumDto);
             }
 
@@ -106,14 +112,21 @@ public class AlbumService : IAlbumService
         await _dbService.BeginTransactionAsync();
         try
         {
-            var query = @"SELECT a.id, a.name, a.image_path AS imagePath 
-                FROM album_songs aso
-                JOIN album a ON aso.album_id = a.id 
-                WHERE aso.song_id = @SongId;";
+            var query = @"SELECT a.id, a.name, a.image_path AS ImagePath, a.release_date AS ReleaseDate
+                      FROM album_songs aso
+                      JOIN album a ON aso.album_id = a.id 
+                      WHERE aso.song_id = @SongId;";
             var parameters = new { SongId = song_id };
             var album = await _dbService.GetAsync<Album>(query, parameters);
+            var songIds = await GetSongsFromAlbum(album.Id);
+            var genreIds = await GetGenreIdsFromAlbum(album.Id);
+
             await _dbService.CommitTransactionAsync();
-            return AlbumDto.CopyAlbumToDto(album);
+
+            var albumDto = AlbumDto.CopyAlbumToDto(album);
+            albumDto.SongIds = songIds;
+            albumDto.GenreIds = genreIds;
+            return albumDto;
         }
         catch
         {
@@ -121,6 +134,7 @@ public class AlbumService : IAlbumService
             throw;
         }
     }
+
     public async Task<List<AlbumDto>> GetAlbumListByName(string name)
     {
         await _dbService.BeginTransactionAsync();
@@ -214,5 +228,13 @@ public class AlbumService : IAlbumService
         var parameters = new { AlbumId = albumId };
         var songIds = await _dbService.GetAll<long>(query, parameters);
         return songIds.ToList();
+    }
+
+    private async Task<List<long>> GetGenreIdsFromAlbum(int albumId)
+    {
+        var query = @"SELECT genre_id FROM public.album_genres WHERE album_id = @AlbumId";
+        var parameters = new { AlbumId = albumId };
+        var genreIds = await _dbService.GetAll<long>(query, parameters);
+        return genreIds.ToList();
     }
 }

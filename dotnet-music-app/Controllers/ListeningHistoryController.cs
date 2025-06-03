@@ -16,4 +16,11 @@ public class ListeningHistoryController : Controller
         await _listeningHistoryService.RecordListening(listening.UserId, listening.SongId, listening.ListeningTime);
         return Ok();
     }
+
+    [HttpGet("user/{userId:int}")]
+    public async Task<ActionResult<List<ListeningHistory>>> GetUserListeningHistory(int userId)
+    {
+        var playlists = await _listeningHistoryService.GetListeningHistoryByUserId(userId);
+        return Ok(playlists);
+    }
 }

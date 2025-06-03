@@ -6,6 +6,7 @@ import type { Song } from '@/types/Song'
 import type { User } from '@/types/User'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
+import router from '@/router'
 
 const secondsListened = ref(0)
 const store = usePlayerStore()
@@ -24,7 +25,7 @@ const muted = ref(false)
 const previousVolume = ref(volume.value)
 const authStore = useAuthStore()
 const MINIMUM_LISTENING_TIME = 10
-let lastTime = 0;
+let lastTime = 0
 
 watch(
   () => store.playlist,
@@ -67,24 +68,24 @@ watch(currentSong, (newSong, oldSong) => {
 watch(audio, (el) => {
   if (el) {
     el.addEventListener('timeupdate', () => {
-      const current = el.currentTime;
-      currentTime.value = current;
+      const current = el.currentTime
+      currentTime.value = current
       if (current > lastTime) {
-        secondsListened.value += current - lastTime;
+        secondsListened.value += current - lastTime
       }
 
-      lastTime = current;
-    });
+      lastTime = current
+    })
 
     el.addEventListener('loadedmetadata', () => {
-      duration.value = el.duration;
-      lastTime = 0;
-      secondsListened.value = 0;
-    });
+      duration.value = el.duration
+      lastTime = 0
+      secondsListened.value = 0
+    })
 
-    el.addEventListener('ended', nextSong);
+    el.addEventListener('ended', nextSong)
   }
-});
+})
 
 function seekAudio(percent: number) {
   if (audio.value && duration.value) {
@@ -190,8 +191,7 @@ const imageSource = computed(() => {
 })
 
 async function sendListeningHistory(songId: number, listeningTime: number) {
-  if(authStore.isLoggedIn)
-  {
+  if (authStore.isLoggedIn) {
     try {
       await axios.post(`${API_BASE_URL}/ListeningHistory/listen`, {
         userId: authStore.userId,
@@ -201,11 +201,13 @@ async function sendListeningHistory(songId: number, listeningTime: number) {
     } catch (error) {
       console.error('Failed to send listening history:', error)
     }
-  }
-  else
-  {
+  } else {
     console.log('No user logged in.')
   }
+}
+
+const handleHistoryClick = () => {
+  router.push({ name: 'listening-history', params: { id: authStore.userId } })
 }
 </script>
 
@@ -276,15 +278,16 @@ async function sendListeningHistory(songId: number, listeningTime: number) {
 
       <div class="flex items-center">
         <icon-button
+          :iconName="'bi-clock-history'"
+          @click="handleHistoryClick"
+          class="mr-2 text-white text-xl hover:text-2xl"
+        ></icon-button>
+        <icon-button
           :iconName="muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
           @click="toggleMute"
           class="mr-2 text-white text-2xl hover:text-3xl"
         ></icon-button>
-        <track-bar 
-        :width="220" 
-        :height="11" 
-        :percent="volume * 100" 
-        @input="setVolume" />
+        <track-bar :width="220" :height="11" :percent="volume * 100" @input="setVolume" />
       </div>
     </div>
   </div>

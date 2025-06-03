@@ -4,10 +4,12 @@ import { SongList } from './SongList'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export class Album extends SongList {
   releaseDate: string
+  genreIds: number[]
 
-  constructor(id: number, name: string, imagePath: string, songIds: number[], releaseDate: string) {
+  constructor(id: number, name: string, imagePath: string, songIds: number[], releaseDate: string, genreIds: number[] = []) {
     super(id, name, imagePath, songIds)
     this.releaseDate = releaseDate
+    this.genreIds = genreIds
   }
 
   static async fetchById(albumId: number): Promise<Album> {

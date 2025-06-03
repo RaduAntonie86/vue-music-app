@@ -43,4 +43,14 @@ public class ListeningHistoryService : IListeningHistoryService
             throw;
         }
     }
+    public async Task<List<ListeningHistory>> GetListeningHistoryByUserId(long userId)
+    {
+        var query = @"
+            SELECT song_id AS SongId, user_id AS UserId, listening_time AS ListeningTime, date AS ListeningDate
+            FROM listening_history
+            WHERE user_id = @UserId
+            ORDER BY date DESC;";
+        var parameters = new { UserId = userId };
+        return (await _dbService.GetAll<ListeningHistory>(query, parameters)).ToList();
+    }
 }

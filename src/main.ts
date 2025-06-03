@@ -28,6 +28,7 @@ import SearchMenu from './features/search/SearchMenu.vue'
 import PlaylistList from './features/playlist/PlaylistList.vue'
 import PlaylistCreation from './features/playlist/PlaylistCreation.vue'
 import CustomDivider from './components/common/CustomDivider.vue'
+import HistoryList from './features/history/HistoryList.vue'
 
 const app = createApp(App)
 app.use(createPinia())
@@ -47,6 +48,7 @@ app.component('custom-divider', CustomDivider)
 app.component('playlist-preview', PlaylistPreview)
 app.component('icon-button', IconButton)
 app.component('playlist-creation', PlaylistCreation)
+app.component('history-list', HistoryList)
 
 createApp(App).use(PerfectScrollbarPlugin).mount('#app')
 createApp(App).use(router).mount('#app')

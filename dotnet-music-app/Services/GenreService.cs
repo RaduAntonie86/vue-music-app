@@ -98,4 +98,23 @@ public class GenreService : IGenreService
             throw;
         }
     }
+    public async Task<List<GenreDto>> GetGenresByIds(List<int> ids)
+    {
+        await _dbService.BeginTransactionAsync();
+        try
+        {
+            var query = @"SELECT * FROM public.genre WHERE id = ANY(@Ids)";
+            var parameters = new { Ids = ids.ToArray() };
+
+            var genres = await _dbService.GetAll<Genre>(query, parameters);
+            await _dbService.CommitTransactionAsync();
+
+            return genres.Select(GenreDto.CopyGenreToDto).ToList();
+        }
+        catch
+        {
+            await _dbService.RollbackTransactionAsync();
+            throw;
+        }
+    }
 }

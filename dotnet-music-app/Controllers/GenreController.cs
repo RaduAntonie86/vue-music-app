@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 public class GenreController : Controller
 {
     private readonly IGenreService _genreService;
-    
+
     public GenreController(IGenreService genreService)
     {
         _genreService = genreService;
@@ -14,40 +14,50 @@ public class GenreController : Controller
     [HttpGet]
     public async Task<IActionResult> GetGenreList()
     {
-        var result =  await _genreService.GetGenreList();
+        var result = await _genreService.GetGenreList();
 
         return Ok(result);
     }
-    
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetGenre(int id)
     {
-        var result =  await _genreService.GetGenre(id);
+        var result = await _genreService.GetGenre(id);
 
         return Ok(result);
     }
-    
+
     [HttpPost]
-    public async Task<IActionResult> AddGenre([FromBody]Genre genre)
+    public async Task<IActionResult> AddGenre([FromBody] Genre genre)
     {
-        var result =  await _genreService.CreateGenre(genre);
+        var result = await _genreService.CreateGenre(genre);
 
         return Ok(result);
     }
-    
+
     [HttpPut]
-    public async Task<IActionResult> UpdateGenre([FromBody]Genre genre)
+    public async Task<IActionResult> UpdateGenre([FromBody] Genre genre)
     {
-        var result =  await _genreService.UpdateGenre(genre);
+        var result = await _genreService.UpdateGenre(genre);
 
         return Ok(result);
     }
-    
+
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteGenre(int id)
     {
-        var result =  await _genreService.DeleteGenre(id);
+        var result = await _genreService.DeleteGenre(id);
 
         return Ok(result);
+    }
+    [HttpPost("byIds")]
+    public async Task<IActionResult> GetGenresByIds([FromBody] List<int> ids)
+    {
+        if (ids == null || ids.Count == 0)
+            return BadRequest("No genre IDs provided.");
+
+        var genres = await _genreService.GetGenresByIds(ids);
+
+        return Ok(genres);
     }
 }

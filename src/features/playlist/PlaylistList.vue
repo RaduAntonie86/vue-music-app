@@ -69,11 +69,18 @@ const fetchUsersByIds = async (ids: number[]) => {
 const playSong = (song: Song) => {
   const index = songs.value.findIndex((s) => s.id === song.id)
   if (index !== -1) {
+    const songsWithBlobs = songs.value.map((s) => ({
+      ...s,
+      audioPath: localFilesMap.value[s.id] || s.path,
+      isLocal: !!localFilesMap.value[s.id],
+    }))
+
     store.setPlaylist(
-      songs.value,
-      songs.value.map((song) => songArtists.value[song.id] || []),
-      songs.value.map((song) => albums.value[song.id])
+      songsWithBlobs,
+      songsWithBlobs.map((song) => songArtists.value[song.id] || []),
+      songsWithBlobs.map((song) => albums.value[song.id] || { id: -1, name: 'Local', imagePath: '' })
     )
+
     store.playSongByIndex(index)
   }
 }
@@ -151,6 +158,43 @@ const fetchUserPlaylists = async () => {
   }
 }
 
+const userImageSource = computed(() => {
+  const path = firstUser.value?.imagePath?.trim()
+
+  if (!path) return '/images/users/user.jpg'
+
+  if (path.startsWith('/') || path.includes('images/')) {
+    return path
+  }
+
+  return `/images/users/${path}`
+})
+
+const localSongs = ref<Song[]>([])
+const localFilesMap = ref<Record<number, string>>({}) // id -> Blob URL
+let localIdCounter = 1_000_000 // local song IDs
+
+const addLocalSongs = async (files: FileList | null) => {
+  if (!files) return
+
+  for (const file of Array.from(files)) {
+    const id = localIdCounter++
+    const url = URL.createObjectURL(file)
+
+    localFilesMap.value[id] = url
+    localSongs.value.push({
+      id,
+      name: file.name.replace(/\.[^/.]+$/, ''),
+      length: 0, // Could be extracted from metadata if needed
+      listens: 0,
+      path: '', // You could store this temporarily if needed
+    } as Song)
+
+    playlist.value?.songIds.push(id)
+    songs.value.push(localSongs.value[localSongs.value.length - 1])
+  }
+}
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -162,18 +206,6 @@ watch(
 onMounted(() => {
   fetchPlaylist()
   fetchUserPlaylists()
-})
-
-const userImageSource = computed(() => {
-  const path = firstUser.value?.imagePath?.trim()
-
-  if (!path) return '/images/users/user.jpg'
-
-  if (path.startsWith('/') || path.includes('images/')) {
-    return path
-  }
-
-  return `/images/users/${path}`
 })
 </script>
 
@@ -245,6 +277,22 @@ const userImageSource = computed(() => {
         >
           Delete Playlist
         </button>
+        <label
+          v-if="isOwner"
+          for="fileInput"
+          class="cursor-pointer font-arial text-xl font-semibold bg-white rounded-xl px-4 py-2 text-[#882323] hover:text-[#888888]"
+        >
+          Add Local Songs
+        </label>
+        <input
+          v-if="isOwner"
+          id="fileInput"
+          type="file"
+          accept="audio/*"
+          multiple
+          class="hidden"
+          @change="(e) => addLocalSongs((e.target as HTMLInputElement).files)"
+        />
       </div>
     </div>
     <div class="grid grid-cols-9 p-2 mx-2 font-arial text-[#753E3E] font-bold">
