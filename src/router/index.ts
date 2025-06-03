@@ -7,6 +7,7 @@ import LoginPage from '@/features/auth/LoginPage.vue'
 import SignupPage from '@/features/auth/SignupPage.vue'
 import CreatePlaylist from '@/features/playlist/CreatePlaylist.vue'
 import ListeningHistory from '@/features/history/ListeningHistory.vue'
+import LocalSongs from '@/features/localmusic/LocalSongs.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,9 +50,15 @@ const router = createRouter({
       component: CreatePlaylist
     },
     {
-      path: '/user/:id',
+      path: '/listening-history/:id',
       name: 'listening-history',
       component: ListeningHistory,
+      props: true
+    },
+    {
+      path: '/local-storage',
+      name: 'local-storage',
+      component: LocalSongs,
       props: true
     },
   ]

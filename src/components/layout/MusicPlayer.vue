@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useMediaControls } from '@vueuse/core'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { usePlayerStore } from '@/stores/usePlayerStore'
 import type { Song } from '@/types/Song'
 import type { User } from '@/types/User'
@@ -12,142 +11,184 @@ const secondsListened = ref(0)
 const store = usePlayerStore()
 const audio = ref<HTMLAudioElement | null>(null)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-const songPath = computed(() =>
-  store.currentSong ? `${API_BASE_URL}/Song/stream/${store.currentSong.id}` : ''
-)
-const { playing, volume } = useMediaControls(audio)
-const currentSong = computed(() => store.currentSong)
+const authStore = useAuthStore()
+
+const playing = ref(false)
+const volume = ref(0.5)
 const currentTime = ref(0)
 const duration = ref(0)
 const repeat = ref(false)
 const shuffle = ref(false)
 const muted = ref(false)
 const previousVolume = ref(volume.value)
-const authStore = useAuthStore()
 const MINIMUM_LISTENING_TIME = 10
 let lastTime = 0
+
+const songPath = computed(() => {
+  if (store.localBlobs[store.currentIndex]) {
+    return store.localBlobs[store.currentIndex]!
+  }
+  if (store.currentSong) {
+    return `${API_BASE_URL}/Song/stream/${store.currentSong.id}`
+  }
+  return ''
+})
+
+const currentSong = computed(() => store.currentSong)
+
+const imageSource = computed(() => {
+  const path = store.currentAlbum?.imagePath?.trim()
+  if (!path) return '/images/albums/album.jpeg'
+  if (path.startsWith('/') || path.includes('images/')) return path
+  return `/images/albums/${path}`
+})
 
 watch(
   () => store.playlist,
   (val: Song[]) => {
-    console.log(
-      'Playlist changed',
-      val.map((s) => s.name)
-    )
+    console.log('Playlist changed:', val.map(s => s.name))
   }
 )
 
-watch(currentSong, (newSong, oldSong) => {
+watch(currentSong, async (newSong, oldSong) => {
   if (oldSong && secondsListened.value >= MINIMUM_LISTENING_TIME) {
-    sendListeningHistory(oldSong.id, secondsListened.value)
-    console.log('Sent song.')
+    await sendListeningHistory(oldSong.id, Math.floor(secondsListened.value))
+    console.log('Sent listening history for:', oldSong.name)
   }
-  console.log(secondsListened.value)
-
   secondsListened.value = 0
+  lastTime = 0
+  currentTime.value = 0
+
   if (newSong && audio.value) {
-    const tryPlay = () => {
-      audio.value
-        ?.play()
-        .then(() => {
-          playing.value = true
-        })
-        .catch((err) => {
-          console.error('Autoplay failed:', err)
-        })
-
-      audio.value?.removeEventListener('canplay', tryPlay)
-    }
-
-    audio.value.addEventListener('canplay', tryPlay, { once: true })
-
     audio.value.load()
-  }
-})
-
-watch(audio, (el) => {
-  if (el) {
-    el.addEventListener('timeupdate', () => {
-      const current = el.currentTime
-      currentTime.value = current
-      if (current > lastTime) {
-        secondsListened.value += current - lastTime
+    
+    await new Promise<void>((resolve, reject) => {
+      const onLoaded = () => {
+        audio.value?.removeEventListener('loadedmetadata', onLoaded)
+        resolve()
       }
+      audio.value?.addEventListener('loadedmetadata', onLoaded)
 
-      lastTime = current
+      setTimeout(() => reject(new Error('Timeout loading metadata')), 5000)
     })
 
-    el.addEventListener('loadedmetadata', () => {
-      duration.value = el.duration
-      lastTime = 0
-      secondsListened.value = 0
-    })
-
-    el.addEventListener('ended', nextSong)
+    try {
+      await audio.value.play()
+      playing.value = true
+    } catch (err) {
+      console.error('Autoplay failed:', err)
+    }
   }
 })
 
-function seekAudio(percent: number) {
-  if (audio.value && duration.value) {
-    const newTime = (percent / 100) * duration.value
-    audio.value.currentTime = newTime
-    currentTime.value = newTime
-  }
+function setupAudioListeners() {
+  if (!audio.value) return
+
+  audio.value.addEventListener('timeupdate', onTimeUpdate)
+  audio.value.addEventListener('loadedmetadata', onLoadedMetadata)
+  audio.value.addEventListener('ended', onEnded)
+  audio.value.addEventListener('error', onAudioError)
 }
 
-function playSong() {
-  if (audio.value) {
-    audio.value
-      .play()
-      .then(() => {
-        playing.value = true
-      })
-      .catch((err) => {
-        console.error('Autoplay failed:', err)
-      })
-  }
+function removeAudioListeners() {
+  if (!audio.value) return
+
+  audio.value.removeEventListener('timeupdate', onTimeUpdate)
+  audio.value.removeEventListener('loadedmetadata', onLoadedMetadata)
+  audio.value.removeEventListener('ended', onEnded)
+  audio.value.removeEventListener('error', onAudioError)
 }
 
-function pauseSong() {
-  if (audio.value) {
-    playing.value = false
-    audio.value.pause()
+function onTimeUpdate() {
+  if (!audio.value) return
+  const current = audio.value.currentTime
+  currentTime.value = current
+  
+  const delta = current - lastTime
+  
+  if (delta > 0 && delta < 1) {
+    secondsListened.value += delta
   }
+  
+  lastTime = current
 }
 
-function togglePlayPause() {
-  if (playing.value) {
-    pauseSong()
-  } else {
-    playSong()
-  }
+function onLoadedMetadata() {
+  if (!audio.value) return
+  duration.value = audio.value.duration
+  lastTime = 0
+  secondsListened.value = 0
 }
 
-function handleAudioError() {
+function onEnded() {
+  nextSong()
+}
+
+function onAudioError() {
   console.error('Error loading audio')
 }
 
-const nextSong = () => {
-  if (store.currentIndex < store.playlist.length - 1) {
-    store.playSongByIndex(store.currentIndex + 1)
-  } else if (repeat.value) store.playSongByIndex(0)
+onMounted(() => {
+  setupAudioListeners()
+})
+
+onBeforeUnmount(() => {
+  removeAudioListeners()
+})
+
+function playSong() {
+  if (!audio.value) return
+  audio.value.play().then(() => {
+    playing.value = true
+  }).catch(err => {
+    console.error('Play failed:', err)
+  })
 }
 
-const selectNextSong = () => {
-  if (store.currentIndex < store.playlist.length - 1) {
-    store.playSongByIndex(store.currentIndex + 1)
-  } else store.playSongByIndex(0)
+function pauseSong() {
+  if (!audio.value) return
+  audio.value.pause()
+  playing.value = false
 }
 
-const selectPreviousSong = () => {
-  if (audio.value) {
-    if (audio.value.currentTime > 1) {
-      audio.value.currentTime = 0
-    } else if (store.currentIndex > 0) {
-      store.playSongByIndex(store.currentIndex - 1)
-    } else {
-      store.playSongByIndex(store.playlist.length - 1)
-    }
+function togglePlayPause() {
+  if (playing.value) pauseSong()
+  else playSong()
+}
+
+function seekAudio(percent: number) {
+  if (!audio.value || !duration.value) return
+  const newTime = (percent / 100) * duration.value
+  audio.value.currentTime = newTime
+  currentTime.value = newTime
+}
+
+function nextSong() {
+  if (store.currentIndex < store.playlist.length - 1) {
+    store.playSongByIndex(store.currentIndex + 1)
+  } else if (repeat.value) {
+    store.playSongByIndex(0)
+  } else {
+    pauseSong()
+  }
+}
+
+function selectNextSong() {
+  if (store.currentIndex < store.playlist.length - 1) {
+    store.playSongByIndex(store.currentIndex + 1)
+  } else {
+    store.playSongByIndex(0)
+  }
+}
+
+function selectPreviousSong() {
+  if (!audio.value) return
+  if (audio.value.currentTime > 1) {
+    audio.value.currentTime = 0
+  } else if (store.currentIndex > 0) {
+    store.playSongByIndex(store.currentIndex - 1)
+  } else {
+    store.playSongByIndex(store.playlist.length - 1)
   }
 }
 
@@ -176,54 +217,52 @@ function toggleMute() {
 
 function setVolume(newPercent: number) {
   volume.value = newPercent / 100
+  if (volume.value > 0) muted.value = false
+  if (audio.value) audio.value.volume = volume.value
 }
-
-const imageSource = computed(() => {
-  const path = store.currentAlbum?.imagePath?.trim()
-
-  if (!path) return '/images/albums/album.jpeg'
-
-  if (path.startsWith('/') || path.includes('images/')) {
-    return path
-  }
-
-  return `/images/albums/${path}`
-})
 
 async function sendListeningHistory(songId: number, listeningTime: number) {
-  if (authStore.isLoggedIn) {
-    try {
-      await axios.post(`${API_BASE_URL}/ListeningHistory/listen`, {
-        userId: authStore.userId,
-        songId,
-        listeningTime
-      })
-    } catch (error) {
-      console.error('Failed to send listening history:', error)
-    }
-  } else {
-    console.log('No user logged in.')
+  if (!authStore.isLoggedIn) {
+    console.log('No user logged in. Skipping listening history.')
+    return
+  }
+  try {
+    await axios.post(`${API_BASE_URL}/ListeningHistory/listen`, {
+      userId: authStore.userId,
+      songId,
+      listeningTime
+    })
+  } catch (error) {
+    console.error('Failed to send listening history:', error)
   }
 }
 
-const handleHistoryClick = () => {
+function handleHistoryClick() {
   router.push({ name: 'listening-history', params: { id: authStore.userId } })
 }
 </script>
 
 <template>
-  <div class="bg-[#362323]">
+  <div class="bg-[#362323] p-3">
     <div class="grid grid-cols-3 md:grid-cols-5 gap-2 items-center">
-      <div class="flex align-middle items-center">
-        <img class="rounded-3xl mr-[10px]" :src="imageSource" width="70" height="70" />
+      <div class="flex items-center">
+        <img
+          class="rounded-3xl mr-3"
+          :src="imageSource"
+          width="70"
+          height="70"
+          alt="Album Cover"
+          loading="lazy"
+        />
         <div>
-          <div class="text-white text-lg font-arial">
+          <div class="text-white text-lg font-arial font-semibold">
             {{ store.currentSong?.name || 'No song playing' }}
           </div>
           <div class="text-white text-xs font-arial">
             {{
-              (store.currentArtists as User[]).map((artist) => artist.displayName).join(', ') ||
-              'Unknown Artist'
+              (store.currentArtists as User[])
+                .map(artist => artist.displayName)
+                .join(', ') || 'Unknown Artist'
             }}
           </div>
         </div>
@@ -233,9 +272,10 @@ const handleHistoryClick = () => {
         iconName="bi-shuffle"
         @click="toggleShuffle"
         :class="[
-          'hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
+          'hidden md:flex justify-center items-center h-full text-xl hover:text-2xl cursor-pointer',
           shuffle ? 'text-[#888888]' : 'text-white'
         ]"
+        aria-label="Toggle Shuffle"
       ></icon-button>
 
       <div class="flex flex-col items-center justify-center h-full">
@@ -243,17 +283,20 @@ const handleHistoryClick = () => {
           <icon-button
             @click="selectPreviousSong"
             iconName="bi-skip-backward-fill"
-            class="mr-5 text-[22px] text-white hover:text-2xl"
+            class="mr-5 text-[22px] text-white hover:text-2xl cursor-pointer"
+            aria-label="Previous Song"
           ></icon-button>
           <icon-button
             @click="togglePlayPause"
             :iconName="playing ? 'bi-pause-fill' : 'bi-play-fill'"
-            class="text-[25px] text-white hover:text-2xl"
+            class="text-[25px] text-white hover:text-2xl cursor-pointer"
+            aria-label="Play/Pause"
           ></icon-button>
           <icon-button
             @click="selectNextSong"
             iconName="bi-skip-forward-fill"
-            class="ml-5 text-[22px] text-white hover:text-2xl"
+            class="ml-5 text-[22px] text-white hover:text-2xl cursor-pointer"
+            aria-label="Next Song"
           ></icon-button>
         </div>
 
@@ -261,7 +304,7 @@ const handleHistoryClick = () => {
           <track-bar
             :width="250"
             :height="9"
-            :percent="(currentTime / duration) * 100"
+            :percent="duration ? (currentTime / duration) * 100 : 0"
             @input="seekAudio"
           />
         </div>
@@ -271,26 +314,29 @@ const handleHistoryClick = () => {
         iconName="bi-repeat"
         @click="toggleRepeat"
         :class="[
-          'hidden md:flex justify-center items-center h-full text-xl hover:text-2xl',
+          'hidden md:flex justify-center items-center h-full text-xl hover:text-2xl cursor-pointer',
           repeat ? 'text-[#888888]' : 'text-white'
         ]"
+        aria-label="Toggle Repeat"
       ></icon-button>
 
       <div class="flex items-center">
         <icon-button
-          :iconName="'bi-clock-history'"
+          iconName="bi-clock-history"
           @click="handleHistoryClick"
-          class="mr-2 text-white text-xl hover:text-2xl"
+          class="mr-2 text-white text-xl hover:text-2xl cursor-pointer"
+          aria-label="Listening History"
         ></icon-button>
         <icon-button
           :iconName="muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
           @click="toggleMute"
-          class="mr-2 text-white text-2xl hover:text-3xl"
+          class="mr-2 text-white text-2xl hover:text-3xl cursor-pointer"
+          aria-label="Toggle Mute"
         ></icon-button>
         <track-bar :width="220" :height="11" :percent="volume * 100" @input="setVolume" />
       </div>
     </div>
-  </div>
 
-  <audio ref="audio" :src="songPath" @error="handleAudioError"></audio>
+    <audio ref="audio" :src="songPath" preload="metadata" crossorigin="anonymous"></audio>
+  </div>
 </template>
