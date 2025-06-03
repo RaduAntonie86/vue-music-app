@@ -1,6 +1,13 @@
 using Dapper;
+using Microsoft.ML;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+var mlContext = new MLContext();
+
+// Register your assembly in the internal component catalog:
+mlContext.ComponentCatalog.RegisterAssembly(typeof(AlbumRecommendationService).Assembly);
 
 builder.Services.AddScoped<IDbService, MusicAppDbService>();
 builder.Services.AddScoped<ISongService, SongService>();
@@ -10,6 +17,7 @@ builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IListeningHistoryService, ListeningHistoryService>();
+builder.Services.AddScoped<IAlbumRecommendationService, AlbumRecommendationService>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
