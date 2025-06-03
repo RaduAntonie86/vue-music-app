@@ -8,4 +8,5 @@ public interface IPlaylistService
     Task<bool> DeletePlaylist(int key);
     Task<List<PlaylistDto>> GetPlaylistsByUserId(int userId);
     Task<List<PlaylistDto>> GetPlaylistsByName(string name);
+    Task<bool> RemoveSongFromPlaylist(int playlistId, int songId);
 }

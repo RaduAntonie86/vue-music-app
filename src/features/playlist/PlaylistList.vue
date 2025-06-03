@@ -163,6 +163,28 @@ const userImageSource = computed(() => {
   return `/images/users/${path}`
 })
 
+const removeSongFromPlaylist = async (songId: number) => {
+  if (!playlistId.value) return
+
+  try {
+    await Playlist.removeSong(playlistId.value, songId)
+
+    if (playlist.value?.songIds) {
+      playlist.value.songIds = playlist.value.songIds.filter(id => id !== songId)
+    }
+
+    songs.value = songs.value.filter(s => s.id !== songId)
+    
+    delete songArtists.value[songId]
+    delete albums.value[songId]
+
+    console.log(`Removed song ${songId} from playlist ${playlistId.value}`)
+  } catch (error) {
+    console.error('Error removing song from playlist:', error)
+    alert('Failed to remove the song from the playlist.')
+  }
+}
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -247,7 +269,7 @@ onMounted(() => {
         </button>
       </div>
     </div>
-    <div class="grid grid-cols-9 p-2 mx-2 font-arial text-[#753E3E] font-bold">
+    <div class="grid grid-cols-11 p-2 mx-2 font-arial text-[#753E3E] font-bold">
       <div>#</div>
       <div class="col-span-2">Title</div>
       <div class="col-span-2">Album</div>
@@ -260,7 +282,7 @@ onMounted(() => {
         :height="9"
       />
     </div>
-    <PerfectScrollbar class="min-h-[38vh] max-h-[38vh] overflow-hidden">
+    <PerfectScrollbar class="min-h-[35vh] max-h-[35vh] overflow-hidden">
       <button
         v-for="(songId, index) in playlistSongIds"
         :key="songId"
@@ -272,7 +294,7 @@ onMounted(() => {
         "
         class="w-full text-left cursor-pointer focus:outline-none hover:text-[#888888]"
       >
-        <div class="grid grid-cols-9 p-2 mx-2 font-arial font-bold">
+        <div class="grid grid-cols-11 p-2 mx-2 font-arial font-bold">
           <div class="flex place-items-center font-normal">{{ index + 1 }}</div>
           <div class="col-span-2">
             <div class="flex align-middle place-items-center mb-2 mt-2">
@@ -317,6 +339,16 @@ onMounted(() => {
                 }
               "
               class="bi bi-plus-lg hover:text-white cursor-pointer"
+            ></i>
+          </div>
+          <div class="col-span-2 flex place-items-center font-normal hover:text-xl">
+            <i
+              @click.stop="
+                () => {
+                  removeSongFromPlaylist(songId)
+                }
+              "
+              class="bi bi-dash-lg hover:text-white cursor-pointer"
             ></i>
           </div>
         </div>

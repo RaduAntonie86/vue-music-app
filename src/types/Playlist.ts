@@ -42,6 +42,10 @@ export class Playlist extends SongList {
     await axios.delete(`${API_BASE_URL}/Playlist/${playlistId}`)
   }
 
+  static async removeSong(playlistId: number, songId: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/Playlist/${playlistId}/song/${songId}`)
+  }
+
   static async createPlaylist(playlist: Playlist): Promise<void> {
     await axios.post(`${API_BASE_URL}/Playlist/add`, playlist)
   }

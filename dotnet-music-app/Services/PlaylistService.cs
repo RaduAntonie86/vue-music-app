@@ -180,6 +180,32 @@ public class PlaylistService : IPlaylistService
             throw;
         }
     }
+    public async Task<bool> RemoveSongFromPlaylist(int playlistId, int songId)
+    {
+        await _dbService.BeginTransactionAsync();
+        try
+        {
+            var query = @"
+            DELETE FROM public.playlist_songs
+            WHERE playlist_id = @PlaylistId AND song_id = @SongId";
+
+            var parameters = new
+            {
+                PlaylistId = playlistId,
+                SongId = songId
+            };
+
+            await _dbService.EditData(query, parameters);
+            await _dbService.CommitTransactionAsync();
+            return true;
+        }
+        catch
+        {
+            await _dbService.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
     public async Task<List<PlaylistDto>> GetPlaylistsByUserId(int userId)
     {
         await _dbService.BeginTransactionAsync();

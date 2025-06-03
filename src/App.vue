@@ -3,12 +3,10 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import MusicPlayer from './components/layout/MusicPlayer.vue'
-import { usePlayerStore } from './stores/usePlayerStore'
 
 const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
-const store = usePlayerStore()
 
 const hidePlayerRoutes = ['/login', '/signup']
 
