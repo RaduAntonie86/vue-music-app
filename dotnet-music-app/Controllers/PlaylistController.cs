@@ -53,6 +53,13 @@ public class PlaylistController : Controller
         return Ok(result);
     }
 
+    [HttpPost("{playlist_id:int}/removeSong/{song_id:int}")]
+    public async Task<IActionResult> DeleteSongFromPlaylist(int playlist_id, int song_id)
+    {
+        var result = await _playlistService.DeleteSongFromPlaylist(playlist_id, song_id);
+        return Ok(result);
+    }
+
     [HttpGet("user/{userId:int}")]
     public async Task<ActionResult<List<PlaylistDto>>> GetUserPlaylists(int userId)
     {

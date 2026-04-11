@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/authStore'
 import { usePlayerStore } from '@/stores/usePlayerStore'
 import { Album } from '@/types/Album'
-import { Playlist } from '@/types/Playlist'
 import { Song } from '@/types/Song'
 import { User } from '@/types/User'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -11,9 +9,7 @@ import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
 const route = useRoute()
 const albumId = ref(route.params.id)
-const authStore = useAuthStore()
 const store = usePlayerStore()
-const playlists = ref<Playlist[]>([])
 const showPlaylistModal = ref(false)
 const selectedSong = ref<Song | null>(null)
 const album = ref<Album | null>(null)
@@ -86,16 +82,6 @@ const playSong = (song: Song) => {
   }
 }
 
-const fetchPlaylists = async () => {
-  if (authStore.isLoggedIn) {
-    try {
-      playlists.value = await Playlist.fetchFromUser(authStore.userId!)
-    } catch (error) {
-      console.error('Error fetching playlists:', error)
-    }
-  }
-}
-
 const openPlaylistModal = (song: Song) => {
   selectedSong.value = song
   showPlaylistModal.value = true
@@ -104,17 +90,6 @@ const openPlaylistModal = (song: Song) => {
 const closePlaylistModal = () => {
   selectedSong.value = null
   showPlaylistModal.value = false
-}
-
-const addSongToPlaylist = async (playlistId: number) => {
-  if (!selectedSong.value) return
-  try {
-    Playlist.addSong(playlistId, selectedSong.value.id)
-    console.log(`Added song ${selectedSong.value.id} to playlist ${playlistId}`)
-    closePlaylistModal()
-  } catch (error) {
-    console.error('Error adding song to playlist:', error)
-  }
 }
 
 watch(
@@ -126,7 +101,6 @@ watch(
 )
 
 onMounted(() => {
-  fetchPlaylists()
   fetchAlbum()
 })
 </script>
@@ -232,37 +206,11 @@ onMounted(() => {
       </div>
     </PerfectScrollbar>
 
-    <div
-      v-if="showPlaylistModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-    >
-      <div class="bg-[#2e2e2e] rounded-xl p-6 w-[400px] max-h-[80vh] overflow-y-auto shadow-2xl">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-white text-xl font-bold">Add to Playlist</h2>
-          <button @click="closePlaylistModal" class="text-white text-2xl">&times;</button>
-        </div>
-        <div v-if="authStore.isLoggedIn">
-          <PerfectScrollbar v-if="playlists.length > 0" class="overflow-hidden max-h-[43vh]">
-            <div
-              v-for="playlist in playlists"
-              :key="playlist.id"
-              @click="addSongToPlaylist(playlist.id!)"
-              class="p-3 rounded-md hover:bg-[#444] text-white cursor-pointer flex items-center gap-3"
-            >
-              <img
-                :src="playlist.imagePath || '/images/albums/album.jpeg'"
-                class="w-10 h-10 object-cover rounded-md"
-              />
-              <div>
-                <div class="font-semibold">{{ playlist.name }}</div>
-                <div class="text-sm text-gray-400">{{ playlist.description }}</div>
-              </div>
-            </div>
-          </PerfectScrollbar>
-          <div v-else class="text-gray-400">No playlists found.</div>
-        </div>
-        <div v-else class="text-gray-400">Please log in.</div>
-      </div>
-    </div>
+  <add-to-playlist
+    :song="selectedSong"
+    :visible="showPlaylistModal"
+    @close="closePlaylistModal"
+    @added="(playlistId: number) => console.log('Added to', playlistId)"
+  />
   </div>
 </template>

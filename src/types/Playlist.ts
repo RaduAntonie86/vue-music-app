@@ -45,8 +45,14 @@ export class Playlist extends SongList {
   static async createPlaylist(playlist: Playlist): Promise<void> {
     await axios.post(`${API_BASE_URL}/Playlist/add`, playlist)
   }
+
   static async fetchPlaylistsByName(name: string): Promise<Playlist[]> {
     const response = await axios.get<Playlist[]>(`${API_BASE_URL}/Playlist/name/${name}`)
     return response.data
+  }
+
+  static async removeSong(playlistId: number, selectedSongId: number) 
+  {
+    await axios.post(`${API_BASE_URL}/Playlist/${playlistId}/removeSong/${selectedSongId}`)
   }
 }

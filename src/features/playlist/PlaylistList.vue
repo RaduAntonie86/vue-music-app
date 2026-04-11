@@ -19,9 +19,8 @@ const albums = ref<Record<number, Album>>({})
 const songArtists = ref<Record<number, User[]>>({})
 const authStore = useAuthStore()
 const store = usePlayerStore()
-const selectedSong = ref<Song | null>(null)
 const showPlaylistModal = ref(false)
-const userPlaylists = ref<Playlist[]>([])
+const selectedSong = ref<Song | null>(null)
 
 async function fetchPlaylist() {
   if (!playlistId.value) return
@@ -125,29 +124,20 @@ const openPlaylistModal = (song: Song) => {
   selectedSong.value = song
   showPlaylistModal.value = true
 }
+
 const closePlaylistModal = () => {
   selectedSong.value = null
   showPlaylistModal.value = false
 }
 
-const addSongToPlaylist = async (playlistId: number) => {
-  if (!selectedSong.value) return
+const removeSongFromPlaylist = async (songId: number) => {
+  if (!playlist.value?.id) return
   try {
-    Playlist.addSong(playlistId, selectedSong.value.id)
-    console.log(`Added song ${selectedSong.value.id} to playlist ${playlistId}`)
-    closePlaylistModal()
+    await Playlist.removeSong(playlist.value.id, songId)
+    playlist.value.songIds = playlist.value.songIds.filter((id) => id !== songId)
+    songs.value = songs.value.filter((s) => s.id !== songId)
   } catch (error) {
-    console.error('Error adding song to playlist:', error)
-  }
-}
-
-const fetchUserPlaylists = async () => {
-  if (!authStore.userId) return
-  try {
-    userPlaylists.value = await Playlist.fetchFromUser(authStore.userId)
-    userPlaylists.value = userPlaylists.value.filter((p) => p.id !== playlist.value?.id)
-  } catch (error) {
-    console.error('Error fetching user playlists:', error)
+    console.error('Error removing song from playlist:', error)
   }
 }
 
@@ -161,7 +151,6 @@ watch(
 
 onMounted(() => {
   fetchPlaylist()
-  fetchUserPlaylists()
 })
 </script>
 
@@ -299,51 +288,28 @@ onMounted(() => {
           <div class="col-span-2 flex place-items-center font-normal">
             {{ formatLength(songsById.get(songId)?.length || 0) }}
           </div>
-          <div class="col-span-2 flex place-items-center font-normal hover:text-xl">
-            <i
-              @click.stop="
-                () => {
+            <div class="col-span-2 flex place-items-center font-normal gap-3">
+              <i
+                @click.stop="() => {
                   const song = songsById.get(songId)
                   if (song) openPlaylistModal(song)
-                }
-              "
-              class="bi bi-plus-lg hover:text-white cursor-pointer"
-            ></i>
-          </div>
+                }"
+                class="bi bi-plus-lg hover:text-white cursor-pointer"
+              ></i>
+              <i
+                v-if="isOwner"
+                @click.stop="removeSongFromPlaylist(songId)"
+                class="bi bi-dash-lg hover:text-red-400 cursor-pointer"
+              ></i>
+            </div>
         </div>
       </button>
     </PerfectScrollbar>
-    <div
-      v-if="showPlaylistModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-    >
-      <div class="bg-[#2e2e2e] rounded-xl p-6 w-[400px] max-h-[80vh] overflow-y-auto shadow-2xl">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-white text-xl font-bold">Add to Playlist</h2>
-          <button @click="closePlaylistModal" class="text-white text-2xl">&times;</button>
-        </div>
-        <div v-if="authStore.isLoggedIn">
-          <PerfectScrollbar v-if="userPlaylists.length > 0" class="overflow-hidden max-h-[43vh]">
-            <div
-              v-for="playlist in userPlaylists"
-              :key="playlist.id"
-              @click="addSongToPlaylist(playlist.id!)"
-              class="p-3 rounded-md hover:bg-[#444] text-white cursor-pointer flex items-center gap-3"
-            >
-              <img
-                :src="playlist.imagePath || '/images/albums/album.jpeg'"
-                class="w-10 h-10 object-cover rounded-md"
-              />
-              <div>
-                <div class="font-semibold">{{ playlist.name }}</div>
-                <div class="text-sm text-gray-400">{{ playlist.description }}</div>
-              </div>
-            </div>
-          </PerfectScrollbar>
-          <div v-else class="text-gray-400">No playlists found.</div>
-        </div>
-        <div v-else class="text-gray-400">Please log in.</div>
-      </div>
-    </div>
+    <add-to-playlist
+      :song="selectedSong"
+      :visible="showPlaylistModal"
+      @close="closePlaylistModal"
+      @added="(playlistId: number) => console.log('Added to', playlistId)"
+    />
   </div>
 </template>
