@@ -14,10 +14,6 @@ import TrackBar from './components/common/TrackBar.vue'
 import PlaylistPreview from './features/playlist/PlaylistPreview.vue'
 import IconButton from './components/common/IconButton.vue'
 import Albums from './features/album/AlbumList.vue'
-import SearchMenu from './features/search/SearchMenu.vue'
-import PlaylistList from './features/playlist/PlaylistList.vue'
-import PlaylistCreation from './features/playlist/PlaylistCreation.vue'
-import AddToPlaylist from './features/playlist/AddToPlaylist.vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
@@ -28,6 +24,10 @@ import 'vue3-perfect-scrollbar/style.css'
 
 import App from './App.vue'
 import router from './router'
+import SearchMenu from './features/search/SearchMenu.vue'
+import PlaylistList from './features/playlist/PlaylistList.vue'
+import PlaylistCreation from './features/playlist/PlaylistCreation.vue'
+import HistoryList from './features/history/HistoryList.vue'
 
 const app = createApp(App)
 app.use(createPinia())
@@ -46,7 +46,7 @@ app.component('track-bar', TrackBar)
 app.component('playlist-preview', PlaylistPreview)
 app.component('icon-button', IconButton)
 app.component('playlist-creation', PlaylistCreation)
-app.component('add-to-playlist', AddToPlaylist)
+app.component('history-list', HistoryList)
 
 createApp(App).use(PerfectScrollbarPlugin).mount('#app')
 createApp(App).use(router).mount('#app')
