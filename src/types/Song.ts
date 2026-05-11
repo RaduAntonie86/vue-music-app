@@ -6,12 +6,16 @@ export class Song {
   name: string
   length: number
   listens: number
+  path: string
+  isLocal: boolean;
 
-  constructor(id: number, name: string, length: number, listens: number) {
+  constructor(id: number, name: string, length: number, listens: number, path: string = '', isLocal = false) {
     this.id = id
     this.name = name
     this.length = length
     this.listens = listens
+    this.path = path
+    this.isLocal = isLocal
   }
 
   static async fetchAll(): Promise<Song[]> {

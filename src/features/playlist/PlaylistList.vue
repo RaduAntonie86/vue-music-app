@@ -238,7 +238,7 @@ onMounted(() => {
       <div class="col-span-2"></div>
     </div>
     <div class="mx-2">
-      <mat-divider></mat-divider>
+        <custom-divider :width="'100%'" :height="5" />
     </div>
     <PerfectScrollbar class="min-h-[38vh] max-h-[38vh] overflow-hidden">
       <button

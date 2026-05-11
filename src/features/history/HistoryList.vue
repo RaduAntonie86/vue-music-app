@@ -98,7 +98,7 @@ onMounted(() => {
         <div class="col-span-2">Genres</div>
       </div>
       <div class="mx-2">
-        <custom-divider :width="'100%'" :height="9" />
+        <custom-divider :width="'100%'" :height="5" />
       </div>
     </div>
     <PerfectScrollbar class="min-h-[30vh] max-h-[60vh] overflow-y-auto">
