@@ -6,8 +6,6 @@ public class User
     public required string Password { get; set; }
     public string? ImagePath { get; set; }
     public string? Description { get; set; }
-    public List<int>? ListeningHistory { get; set; }
-    public User() { }
     public User(int id, string displayName, string username, string password, string imagePath = "", string description = "")
     {
         Id = id;
@@ -16,6 +14,5 @@ public class User
         Password = password;
         ImagePath = imagePath;
         Description = description;
-        ListeningHistory = new List<int>();
     }
 }

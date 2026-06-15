@@ -5,7 +5,6 @@ public class Song
     public required long Length { get; set; }
     public required long Listens { get; set; }
     public required string Path { get; set; }
-    public Song() { }
     public Song(int id, string name, long length, long listens, string path)
     {
         Id = id;

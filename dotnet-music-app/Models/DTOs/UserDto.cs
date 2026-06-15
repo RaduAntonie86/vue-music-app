@@ -2,9 +2,8 @@ public class UserDto{
     public required int Id { get; set; }
     public required string DisplayName { get; set; }
     public required string Username { get; set; }
-    public string ImagePath { get; set; }
-    public string Description { get; set; }
-    public List<int> ListeningHistory { get; set; }
+    public string? ImagePath { get; set; }
+    public string? Description { get; set; }
     public UserDto() { }
     protected UserDto(int id, string displayName, string username, string imagePath = "", string description = "")
     {
@@ -13,7 +12,6 @@ public class UserDto{
         Username = username;
         ImagePath = imagePath;
         Description = description;
-        ListeningHistory = new List<int>();
     }    
     public static UserDto CopyUserToDto(User user)
     {

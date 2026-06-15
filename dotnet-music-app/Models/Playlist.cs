@@ -2,7 +2,6 @@ public class Playlist : SongList
 {
     public string Description { get; set; }
     public required List<long> UserIds { get; set; }
-    public Playlist(): base() { }
     public Playlist(
         int id,
         string name,
