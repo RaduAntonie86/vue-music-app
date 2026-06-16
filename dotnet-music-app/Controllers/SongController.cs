@@ -14,7 +14,7 @@ public class SongController : Controller
     [HttpGet]
     public async Task<IActionResult> GetSongList()
     {
-        var result =  await _songService.GetSongList();
+        var result = await _songService.GetSongList();
 
         return Ok(result);
     }
@@ -22,7 +22,7 @@ public class SongController : Controller
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetSong(int id)
     {
-        var result =  await _songService.GetSong(id);
+        var result = await _songService.GetSong(id);
 
         return Ok(result);
     }
@@ -30,7 +30,7 @@ public class SongController : Controller
     [HttpGet("playlist_id/{playlist_id:int}")]
     public async Task<IActionResult> GetSongsFromPlaylist(int playlist_id)
     {
-        var result =  await _songService.GetSongsFromPlaylist(playlist_id);
+        var result = await _songService.GetSongsFromPlaylist(playlist_id);
 
         return Ok(result);
     }
@@ -38,7 +38,7 @@ public class SongController : Controller
     [HttpGet("album_id/{album_id:int}")]
     public async Task<IActionResult> GetSongsFromAlbum(int album_id)
     {
-        var result =  await _songService.GetSongsFromAlbum(album_id);
+        var result = await _songService.GetSongsFromAlbum(album_id);
 
         return Ok(result);
     }
@@ -46,7 +46,7 @@ public class SongController : Controller
     [HttpPost]
     public async Task<IActionResult> AddSong([FromBody]Song song)
     {
-        var result =  await _songService.CreateSong(song);
+        var result = await _songService.CreateSong(song);
 
         return Ok(result);
     }
@@ -54,7 +54,7 @@ public class SongController : Controller
     [HttpPut]
     public async Task<IActionResult> UpdateSong([FromBody]Song song)
     {
-        var result =  await _songService.UpdateSong(song);
+        var result = await _songService.UpdateSong(song);
 
         return Ok(result);
     }
@@ -62,7 +62,7 @@ public class SongController : Controller
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteSong(int id)
     {
-        var result =  await _songService.DeleteSong(id);
+        var result = await _songService.DeleteSong(id);
 
         return Ok(result);
     }

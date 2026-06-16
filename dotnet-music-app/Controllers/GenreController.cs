@@ -14,40 +14,35 @@ public class GenreController : Controller
     [HttpGet]
     public async Task<IActionResult> GetGenreList()
     {
-        var result =  await _genreService.GetGenreList();
-
+        var result = await _genreService.GetGenreList();
         return Ok(result);
     }
     
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetGenre(int id)
     {
-        var result =  await _genreService.GetGenre(id);
-
+        var result = await _genreService.GetGenre(id);
         return Ok(result);
     }
     
     [HttpPost]
     public async Task<IActionResult> AddGenre([FromBody]Genre genre)
     {
-        var result =  await _genreService.CreateGenre(genre);
-
+        var result = await _genreService.CreateGenre(genre);
         return Ok(result);
     }
     
     [HttpPut]
     public async Task<IActionResult> UpdateGenre([FromBody]Genre genre)
     {
-        var result =  await _genreService.UpdateGenre(genre);
-
+        var result = await _genreService.UpdateGenre(genre);
         return Ok(result);
     }
     
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteGenre(int id)
     {
-        var result =  await _genreService.DeleteGenre(id);
-
+        var result = await _genreService.DeleteGenre(id);
         return Ok(result);
     }
 }

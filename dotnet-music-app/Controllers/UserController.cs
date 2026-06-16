@@ -15,7 +15,6 @@ public class UserController : Controller
     public async Task<IActionResult> GetUserList()
     {
         var result = await _userService.GetUserList();
-
         return Ok(result);
     }
 
@@ -23,7 +22,6 @@ public class UserController : Controller
     public async Task<IActionResult> GetUser(int id)
     {
         var result = await _userService.GetUser(id);
-
         return Ok(result);
     }
 
@@ -31,21 +29,18 @@ public class UserController : Controller
     public async Task<IActionResult> GetUsersFromPlaylist(int playlist_id)
     {
         var result = await _userService.GetUsersFromPlaylist(playlist_id);
-
         return Ok(result);
     }
     [HttpGet("song_id/{song_id:int}")]
     public async Task<IActionResult> GetUsersFromSong(int song_id)
     {
         var result = await _userService.GetUsersFromSong(song_id);
-
         return Ok(result);
     }
     [HttpGet("album_id/{album_id:int}")]
     public async Task<IActionResult> GetUsersFromAlbum(int album_id)
     {
         var result = await _userService.GetUsersFromAlbum(album_id);
-
         return Ok(result);
     }
     [HttpPost]
@@ -60,7 +55,6 @@ public class UserController : Controller
     public async Task<IActionResult> UpdateUser([FromBody] User user)
     {
         var result = await _userService.UpdateUser(user);
-
         return Ok(result);
     }
 
@@ -68,7 +62,6 @@ public class UserController : Controller
     public async Task<IActionResult> DeleteUser(int id)
     {
         var result = await _userService.DeleteUser(id);
-
         return Ok(result);
     }
 }
