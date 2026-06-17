@@ -18,7 +18,7 @@ const getAudioDuration = (file: File): Promise<number> => {
 
     audio.addEventListener('loadedmetadata', () => {
       resolve(audio.duration)
-      URL.revokeObjectURL(url) // cleanup
+      URL.revokeObjectURL(url)
     })
 
     audio.addEventListener('error', (e) => {
