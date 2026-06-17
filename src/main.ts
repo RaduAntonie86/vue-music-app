@@ -30,6 +30,7 @@ import PlaylistCreation from './features/playlist/PlaylistCreation.vue'
 import CustomDivider from './components/common/CustomDivider.vue'
 import HistoryList from './features/history/HistoryList.vue'
 import LocalList from './features/localmusic/LocalList.vue'
+import AddToPlaylist from './features/playlist/AddToPlaylist.vue'
 
 const app = createApp(App)
 app.use(createPinia())
@@ -51,6 +52,7 @@ app.component('icon-button', IconButton)
 app.component('playlist-creation', PlaylistCreation)
 app.component('history-list', HistoryList)
 app.component('local-list', LocalList)
+app.component('add-to-playlist', AddToPlaylist)
 
 createApp(App).use(PerfectScrollbarPlugin).mount('#app')
 createApp(App).use(router).mount('#app')
