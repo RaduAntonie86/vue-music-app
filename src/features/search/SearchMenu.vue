@@ -34,7 +34,7 @@ const searchAlbums = async () => {
     let playlistRes: Playlist[] = []
 
     if (!currentSearch.value || currentSearch.value.trim() === '') {
-      albumRes = await Album.fetchAll()
+      albumRes = await Album.fetchTop10()
       playlistRes = await Playlist.fetchAll()
     } else {
       albumRes = await Album.fetchAlbumsByName(currentSearch.value)

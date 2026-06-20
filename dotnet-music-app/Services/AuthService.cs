@@ -1,8 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 public class AuthService : IAuthService
 {
@@ -23,13 +24,30 @@ public class AuthService : IAuthService
             return new LoginResult { IsSuccess = false, ErrorMessage = "No credentials sent" };
         }
         var user = await _dbService.GetAsync<User>("SELECT * FROM public.user where username=@Username", new { username });
-        if (user == null || password != user.Password)
+        if (user == null || !PasswordMatches(password, user.Password))
         {
             return new LoginResult { IsSuccess = false, ErrorMessage = "Invalid credentials" };
         }
 
         var token = GenerateJwtToken(user);
         return new LoginResult { IsSuccess = true, Token = token, Id = user.Id };
+    }
+
+    private static bool PasswordMatches(string inputPassword, string storedPassword)
+    {
+        var hashedInput = HashPassword(inputPassword);
+        if (string.Equals(hashedInput, storedPassword, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return string.Equals(inputPassword, storedPassword, StringComparison.Ordinal);
+    }
+
+    private static string HashPassword(string password)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+        return Convert.ToHexString(bytes);
     }
 
     private string GenerateJwtToken(User user)

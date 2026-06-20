@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 public class UserService : IUserService
 {
     private readonly IDbService _dbService;
@@ -9,6 +12,7 @@ public class UserService : IUserService
 
     public async Task<bool> CreateUser(User user)
     {
+        user.Password = HashPassword(user.Password);
 
         await _dbService.BeginTransactionAsync();
         try
@@ -130,6 +134,8 @@ public class UserService : IUserService
 
     public async Task<UserDto> UpdateUser(User user)
     {
+        user.Password = HashPassword(user.Password);
+
         await _dbService.BeginTransactionAsync();
         try
         {
@@ -145,6 +151,12 @@ public class UserService : IUserService
             await _dbService.RollbackTransactionAsync();
             throw;
         }
+    }
+
+    private static string HashPassword(string password)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+        return Convert.ToHexString(bytes);
     }
 
     public async Task<bool> DeleteUser(int id)

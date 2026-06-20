@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import router from '@/router'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -16,6 +15,8 @@ const handleSignup = async () => {
     return
   }
   try {
+    const hashedPassword = await toSHA256(password.value)
+
     const response = await fetch('http://localhost:5091/User', {
       method: 'POST',
       headers: {
@@ -24,7 +25,7 @@ const handleSignup = async () => {
       body: JSON.stringify({
         displayName: display_name.value,
         username: username.value,
-        password: password.value
+        password: hashedPassword
       })
     })
 
@@ -36,7 +37,7 @@ const handleSignup = async () => {
     authStore.setUserId(data.id, rememberMe.value)
 
     console.log('Sign up success:', data)
-    router.push('/')
+    window.location.href = '/'
   } catch (error) {
     console.error('', error)
   }

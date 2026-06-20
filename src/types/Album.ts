@@ -20,6 +20,10 @@ export class Album extends SongList {
     const response = await axios.get<Album[]>(`${API_BASE_URL}/Album`)
     return response.data
   }
+  static async fetchTop10(): Promise<Album[]> {
+    const response = await axios.get<Album[]>(`${API_BASE_URL}/Album/top10`)
+    return response.data
+  }
   static async fetchAlbumsForSongs(songIds: number[]): Promise<Record<number, Album> | null> {
     const promises = songIds.map((id) =>
       axios.get<Album>(`${API_BASE_URL}/Album/song_id/${id}`)

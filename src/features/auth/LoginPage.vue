@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import router from '@/router'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -16,6 +15,8 @@ const handleLogin = async () => {
   }
 
   try {
+    const hashedPassword = await toSHA256(password.value)
+
     const response = await fetch('http://localhost:5091/Auth/login', {
       method: 'POST',
       headers: {
@@ -23,7 +24,7 @@ const handleLogin = async () => {
       },
       body: JSON.stringify({
         username: username.value,
-        password: password.value
+        password: hashedPassword
       })
     })
 
@@ -34,7 +35,7 @@ const handleLogin = async () => {
     authStore.setUserId(data.id, rememberMe.value)
 
     console.log('Log in success:', data)
-    router.push('/')
+    window.location.href = '/'
   } catch (error) {
     console.error('Login error:', error)
   }

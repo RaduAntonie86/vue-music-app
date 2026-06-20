@@ -25,6 +25,13 @@ public class AlbumController : Controller
         return Ok(result);
     }
 
+    [HttpGet("top10")]
+    public async Task<IActionResult> GetAlbumListTopTen()
+    {
+        var result = await _albumService.GetAlbumListTopTen();
+        return Ok(result);
+    }
+
     [HttpGet("playlist_id/{playlist_id:int}")]
     public async Task<IActionResult> GetAlbumsFromPlaylist(int playlist_id)
     {
